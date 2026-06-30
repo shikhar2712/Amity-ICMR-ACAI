@@ -1,0 +1,9 @@
+streamlit>=1.53.0
+xgboost>=2.1.0,<3.0.0
+pandas>=2.2.0
+numpy==1.23.5
+scikit-learn==1.2.0
+pymongo[srv]>=4.0.0
+torch>=2.0.0
+torchvision>=0.16.0
+torchaudio>=2.0.0

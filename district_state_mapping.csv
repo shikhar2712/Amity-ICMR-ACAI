@@ -1,0 +1,785 @@
+﻿district_encoded,district_name,state
+0,Mulugu,Telangana
+0,Nagarkurnool,Telangana
+0,Kumuram Bheem Asifabad,Telangana
+0,Rajanna Sircilla,Telangana
+0,Peddapalli,Telangana
+0,Adilabad,Telangana
+0,Mahabubabad,Telangana
+0,Jogulamba Gadwal,Telangana
+1,Agar-Malwa,Madhya Pradesh
+10,Alipurduar,West Bengal
+100,Birbhum,West Bengal
+101,Bishnupur,Manipur
+102,Biswanath,Assam
+103,Bokaro,Jharkhand
+104,Bongaigaon,Assam
+105,Botad,Gujarat
+106,Boudh,Odisha
+107,Budaun,Uttar Pradesh
+108,Budgam,Jammu And Kashmir
+109,Bulandshahr,Uttar Pradesh
+11,Alirajpur,Madhya Pradesh
+110,Buldhana,Maharashtra
+111,Bundi,Rajasthan
+112,Burhanpur,Madhya Pradesh
+113,Buxar,Bihar
+114,Cachar,Assam
+115,Central,Delhi
+116,Chamarajanagar,Karnataka
+117,Chamba,Himachal Pradesh
+117,Bilaspur,Himachal Pradesh
+117,Hamirpur,Himachal Pradesh
+118,Chamoli,Uttarakhand
+119,Champawat,Uttarakhand
+12,Dr. B.R. Ambedkar Konaseema,Andhra Pradesh
+12,Alluri Sitharama Raju,Andhra Pradesh
+120,Champhai,Mizoram
+121,Chandauli,Uttar Pradesh
+122,Chandel,Manipur
+123,Chandigarh,Chandigarh
+124,Chandrapur,Maharashtra
+125,Changlang,Arunachal Pradesh
+126,Charaideo,Assam
+127,Charkhi Dadri,Haryana
+128,Chatra,Jharkhand
+129,Chengalpattu,Tamil Nadu
+13,Almora,Uttarakhand
+130,Chennai,Tamil Nadu
+131,Chhatarpur,Madhya Pradesh
+132,Chhatrapati Sambhajinagar,Maharashtra
+133,Chhindwara,Madhya Pradesh
+134,Chhotaudepur,Gujarat
+135,Chikkaballapura,Karnataka
+136,Chikkamagaluru,Karnataka
+137,Chirang,Assam
+138,Chitradurga,Karnataka
+139,Chitrakoot,Uttar Pradesh
+14,Alwar,Rajasthan
+140,Chittoor,Andhra Pradesh
+141,Chittorgarh,Rajasthan
+143,Churachandpur,Manipur
+144,Churu,Rajasthan
+145,Coimbatore,Tamil Nadu
+146,Cooch Behar,West Bengal
+147,Cuddalore,Tamil Nadu
+148,Cuttack,Odisha
+15,Ambala,Haryana
+150,Dahod,Gujarat
+151,Dakshin Bastar Dantewada,Chhattisgarh
+152,Dakshin Dinajpur,West Bengal
+153,Dakshina Kannada,Karnataka
+155,Damoh,Madhya Pradesh
+156,Dangs,Gujarat
+157,Darbhanga,Bihar
+158,Darjeeling,West Bengal
+159,Darrang,Assam
+16,Ambedkar Nagar,Uttar Pradesh
+160,Datia,Madhya Pradesh
+161,Dausa,Rajasthan
+162,Davanagere,Karnataka
+163,Dehradun,Uttarakhand
+164,Deoghar,Jharkhand
+165,Deoria,Uttar Pradesh
+166,Devbhumi Dwarka,Gujarat
+167,Dewas,Madhya Pradesh
+168,Dhalai,Tripura
+169,Dhamtari,Chhattisgarh
+17,Amethi,Uttar Pradesh
+170,Dhanbad,Jharkhand
+171,Dhar,Madhya Pradesh
+172,Dharashiv,Maharashtra
+173,Dharmapuri,Tamil Nadu
+174,Dharwad,Karnataka
+175,Dhemaji,Assam
+176,Dhenkanal,Odisha
+177,Dholpur,Rajasthan
+178,Dhubri,Assam
+179,Dhule,Maharashtra
+18,Amravati,Maharashtra
+180,Dibang Valley,Arunachal Pradesh
+181,Dibrugarh,Assam
+182,Dima Hasao,Assam
+184,Dindigul,Tamil Nadu
+185,Dindori,Madhya Pradesh
+187,Doda,Jammu And Kashmir
+188,Dumka,Jharkhand
+189,Dungarpur,Rajasthan
+19,Amreli,Gujarat
+190,Durg,Chhattisgarh
+191,East,Delhi
+192,East Garo Hills,Meghalaya
+192,Eastern West Khasi Hills,Meghalaya
+193,East Godavari,Andhra Pradesh
+194,East Jaintia Hills,Meghalaya
+195,East Kameng,Arunachal Pradesh
+196,East Khasi Hills,Meghalaya
+197,East Siang,Arunachal Pradesh
+198,East Singhbum,Jharkhand
+199,Eluru,Andhra Pradesh
+2,Agra,Uttar Pradesh
+20,Amritsar,Punjab
+200,Ernakulam,Kerala
+201,Erode,Tamil Nadu
+202,Etah,Uttar Pradesh
+203,Etawah,Uttar Pradesh
+204,Faridabad,Haryana
+205,Faridkot,Punjab
+206,Farrukhabad,Uttar Pradesh
+207,Fatehabad,Haryana
+208,Fatehgarh Sahib,Punjab
+209,Fatehpur,Uttar Pradesh
+21,Amroha,Uttar Pradesh
+210,Fazilka,Punjab
+211,Ferozepur,Punjab
+212,Firozabad,Uttar Pradesh
+213,Gadag,Karnataka
+214,Gadchiroli,Maharashtra
+215,Gajapati,Odisha
+216,Ganderbal,Jammu And Kashmir
+217,Gandhinagar,Gujarat
+218,Ganganagar,Rajasthan
+219,Gyalshing,Sikkim
+219,Gangtok,Sikkim
+219,Pakyong,Sikkim
+22,Anakapalli,Andhra Pradesh
+220,Ganjam,Odisha
+221,Garhwa,Jharkhand
+222,Gariyaband,Chhattisgarh
+223,Gaurela-Pendra-Marwahi,Chhattisgarh
+224,Gautam Buddha Nagar,Uttar Pradesh
+225,Gaya,Bihar
+226,Ghaziabad,Uttar Pradesh
+227,Ghazipur,Uttar Pradesh
+228,Gir Somnath,Gujarat
+229,Giridih,Jharkhand
+23,Anand,Gujarat
+230,Goalpara,Assam
+231,Godda,Jharkhand
+232,Golaghat,Assam
+233,Gomati,Tripura
+234,Gonda,Uttar Pradesh
+235,Gondia,Maharashtra
+236,Gopalganj,Bihar
+237,Gorakhpur,Uttar Pradesh
+238,Gumla,Jharkhand
+239,Guna,Madhya Pradesh
+24,Ananthapuramu,Andhra Pradesh
+240,Guntur,Andhra Pradesh
+241,Gurdaspur,Punjab
+242,Gurugram,Haryana
+243,Gwalior,Madhya Pradesh
+244,Hailakandi,Assam
+245,Hamirpur,Uttar Pradesh
+246,Hanumakonda,Telangana
+247,Hanumangarh,Rajasthan
+248,Hapur,Uttar Pradesh
+249,Harda,Madhya Pradesh
+25,Anantnag,Jammu And Kashmir
+250,Hardoi,Uttar Pradesh
+251,Haridwar,Uttarakhand
+252,Hassan,Karnataka
+253,Hathras,Uttar Pradesh
+254,Haveri,Karnataka
+255,Hazaribagh,Jharkhand
+256,Hingoli,Maharashtra
+257,Hisar,Haryana
+258,Hojai,Assam
+259,Hooghly,West Bengal
+26,Anjaw,Arunachal Pradesh
+260,Hoshiarpur,Punjab
+261,Howrah,West Bengal
+262,Hyderabad,Telangana
+263,Idukki,Kerala
+264,Imphal East,Manipur
+265,Imphal West,Manipur
+266,Indore,Madhya Pradesh
+267,Jabalpur,Madhya Pradesh
+268,Jagatsinghapur,Odisha
+269,Jagitial,Telangana
+27,Annamayya,Andhra Pradesh
+270,Jaipur,Rajasthan
+271,Jaisalmer,Rajasthan
+272,Jajapur,Odisha
+273,Jalandhar,Punjab
+274,Jalaun,Uttar Pradesh
+275,Jalgaon,Maharashtra
+276,Jalna,Maharashtra
+277,Jalore,Rajasthan
+278,Jalpaiguri,West Bengal
+279,Jammu,Jammu And Kashmir
+28,Anugul,Odisha
+280,Jamnagar,Gujarat
+281,Jamtara,Jharkhand
+282,Jamui,Bihar
+283,Jangoan,Telangana
+284,Janjgir-Champa,Chhattisgarh
+285,Jashpur,Chhattisgarh
+286,Jaunpur,Uttar Pradesh
+287,Jehanabad,Bihar
+288,Jhabua,Madhya Pradesh
+289,Jhajjar,Haryana
+29,Anuppur,Madhya Pradesh
+290,Jhalawar,Rajasthan
+291,Jhansi,Uttar Pradesh
+292,Jhargram,West Bengal
+293,Jharsuguda,Odisha
+294,Jhunjhunu,Rajasthan
+295,Jind,Haryana
+296,Jiribam,Manipur
+297,Jodhpur,Rajasthan
+298,Jorhat,Assam
+299,Junagadh,Gujarat
+3,Ahilyanagar,Maharashtra
+30,Araria,Bihar
+300,Kabeerdham,Chhattisgarh
+301,Kachchh,Gujarat
+302,Kaimur (Bhabua),Bihar
+303,Kaithal,Haryana
+304,Kakching,Manipur
+305,Kakinada,Andhra Pradesh
+306,Kalaburagi,Karnataka
+307,Kalahandi,Odisha
+308,Kalimpong,West Bengal
+309,Kallakurichi,Tamil Nadu
+31,Ariyalur,Tamil Nadu
+310,Kamareddy,Telangana
+311,Kamjong,Manipur
+312,Kamle,Arunachal Pradesh
+313,Kamrup,Assam
+314,Kamrup Metro,Assam
+315,Kancheepuram,Tamil Nadu
+316,Kandhamal,Odisha
+317,Kangpokpi,Manipur
+318,Kangra,Himachal Pradesh
+319,Kannauj,Uttar Pradesh
+32,Arvalli,Gujarat
+320,Kanniyakumari,Tamil Nadu
+321,Kannur,Kerala
+322,Kanpur Dehat,Uttar Pradesh
+323,Kanpur Nagar,Uttar Pradesh
+324,Kapurthala,Punjab
+325,Yanam,Puducherry
+325,Karaikal,Puducherry
+326,Karauli,Rajasthan
+327,Karbi Anglong,Assam
+329,Karimganj,Assam
+33,Arwal,Bihar
+330,Karimnagar,Telangana
+331,Karnal,Haryana
+332,Karur,Tamil Nadu
+333,Kasaragod,Kerala
+334,Kasganj,Uttar Pradesh
+335,Kathua,Jammu And Kashmir
+336,Katihar,Bihar
+337,Katni,Madhya Pradesh
+338,Kaushambi,Uttar Pradesh
+339,Kendrapara,Odisha
+34,Ashoknagar,Madhya Pradesh
+340,Kendujhar,Odisha
+341,Khagaria,Bihar
+342,Khairthal-Tijara,Rajasthan
+343,Khammam,Telangana
+344,Khandwa (East Nimar),Madhya Pradesh
+345,Khargone (West Nimar),Madhya Pradesh
+346,Kheda,Gujarat
+347,Kheri,Uttar Pradesh
+348,Khordha,Odisha
+349,Khowai,Tripura
+35,Auraiya,Uttar Pradesh
+350,Khunti,Jharkhand
+351,Kinnaur,Himachal Pradesh
+352,Kishanganj,Bihar
+353,Kishtwar,Jammu And Kashmir
+354,Kodagu,Karnataka
+355,Koderma,Jharkhand
+357,Kokrajhar,Assam
+358,Kolar,Karnataka
+359,Kolasib,Mizoram
+36,Aurangabad,Bihar
+360,Kolhapur,Maharashtra
+361,Kolkata,West Bengal
+362,Kollam,Kerala
+363,Kondagaon,Chhattisgarh
+364,Koppal,Karnataka
+365,Koraput,Odisha
+366,Korba,Chhattisgarh
+367,Korea,Chhattisgarh
+368,Kota,Rajasthan
+369,Kotputli-Behror,Rajasthan
+37,Ayodhya,Uttar Pradesh
+370,Kottayam,Kerala
+371,Kozhikode,Kerala
+372,Kra Daadi,Arunachal Pradesh
+373,Krishna,Andhra Pradesh
+374,Krishnagiri,Tamil Nadu
+375,Kulgam,Jammu And Kashmir
+376,Kullu,Himachal Pradesh
+377,Kupwara,Jammu And Kashmir
+378,Kurnool,Andhra Pradesh
+379,Kurukshetra,Haryana
+38,Azamgarh,Uttar Pradesh
+380,Kurung Kumey,Arunachal Pradesh
+381,Kushinagar,Uttar Pradesh
+382,Lahaul And Spiti,Himachal Pradesh
+383,Lakhimpur,Assam
+384,Lakhisarai,Bihar
+386,Lalitpur,Uttar Pradesh
+387,Latehar,Jharkhand
+388,Latur,Maharashtra
+389,Lawngtlai,Mizoram
+39,Bagalkote,Karnataka
+391,Leparada,Arunachal Pradesh
+392,Lohardaga,Jharkhand
+393,Lohit,Arunachal Pradesh
+394,Longding,Arunachal Pradesh
+396,Lower Dibang Valley,Arunachal Pradesh
+397,Lower Siang,Arunachal Pradesh
+398,Lower Subansiri,Arunachal Pradesh
+399,Lucknow,Uttar Pradesh
+4,Ahmedabad,Gujarat
+40,Bageshwar,Uttarakhand
+400,Ludhiana,Punjab
+401,Lunglei,Mizoram
+403,Madhepura,Bihar
+404,Madhubani,Bihar
+405,Madurai,Tamil Nadu
+406,Mahabubnagar,Telangana
+407,Mahasamund,Chhattisgarh
+408,Mahendragarh,Haryana
+409,Mahesana,Gujarat
+41,Baghpat,Uttar Pradesh
+410,Mahisagar,Gujarat
+411,Mahoba,Uttar Pradesh
+412,Mahrajganj,Uttar Pradesh
+413,Maihar,Madhya Pradesh
+414,Mainpuri,Uttar Pradesh
+415,Majuli,Assam
+416,Malappuram,Kerala
+417,Malda,West Bengal
+418,Malerkotla,Punjab
+419,Malkangiri,Odisha
+42,Bahraich,Uttar Pradesh
+420,Mamit,Mizoram
+421,Mancherial,Telangana
+422,Mandi,Himachal Pradesh
+423,Mandla,Madhya Pradesh
+424,Mandsaur,Madhya Pradesh
+425,Mandya,Karnataka
+426,Mangan,Sikkim
+427,Mansa,Punjab
+428,Marigaon,Assam
+429,Mathura,Uttar Pradesh
+43,Bajali,Assam
+430,Mau,Uttar Pradesh
+431,Mayiladuthurai,Tamil Nadu
+432,Mayurbhanj,Odisha
+433,Medak,Telangana
+434,Medchal Malkajgiri,Telangana
+435,Meerut,Uttar Pradesh
+436,Mirzapur,Uttar Pradesh
+437,Moga,Punjab
+44,Baksa,Assam
+440,Moradabad,Uttar Pradesh
+441,Morbi,Gujarat
+442,Morena,Madhya Pradesh
+443,Mumbai,Maharashtra
+444,Mumbai Suburban,Maharashtra
+445,Mungeli,Chhattisgarh
+446,Munger,Bihar
+447,Murshidabad,West Bengal
+448,Muzaffarnagar,Uttar Pradesh
+449,Muzaffarpur,Bihar
+45,Balaghat,Madhya Pradesh
+450,Mysuru,Karnataka
+451,Nabarangpur,Odisha
+452,Nadia,West Bengal
+453,Nagaon,Assam
+454,Nagapattinam,Tamil Nadu
+455,Nagaur,Rajasthan
+456,Nagpur,Maharashtra
+457,Nainital,Uttarakhand
+458,Nalanda,Bihar
+459,Nalbari,Assam
+46,Balangir,Odisha
+460,Nalgonda,Telangana
+461,Namakkal,Tamil Nadu
+462,Namchi,Sikkim
+463,Namsai,Arunachal Pradesh
+464,Nanded,Maharashtra
+465,Nandurbar,Maharashtra
+466,Nandyal,Andhra Pradesh
+467,Narayanpet,Telangana
+468,Narayanpur,Chhattisgarh
+469,Narmada,Gujarat
+47,Baleshwar,Odisha
+470,Narmadapuram,Madhya Pradesh
+471,Narsimhapur,Madhya Pradesh
+472,Nashik,Maharashtra
+473,Navsari,Gujarat
+474,Nawada,Bihar
+475,Nayagarh,Odisha
+476,Neemuch,Madhya Pradesh
+477,New Delhi,Delhi
+478,Nicobars,Andaman And Nicobar Islands
+479,Nirmal,Telangana
+48,Ballari,Karnataka
+480,Niwari,Madhya Pradesh
+481,Nizamabad,Telangana
+483,Noney,Manipur
+484,North,Delhi
+485,North 24 Parganas,West Bengal
+486,North And Middle Andaman,Andaman And Nicobar Islands
+487,North East,Delhi
+488,North Garo Hills,Meghalaya
+489,North Goa,Goa
+49,Ballia,Uttar Pradesh
+490,North Tripura,Tripura
+491,North West,Delhi
+492,Ntr,Andhra Pradesh
+493,Nuapada,Odisha
+494,Nuh,Haryana
+495,Pakur,Jharkhand
+496,Palakkad,Kerala
+497,Palamu,Jharkhand
+498,Palghar,Maharashtra
+499,Pali,Rajasthan
+499,Pratapgarh,Rajasthan
+5,Khawzawl,Mizoram
+5,Aizawl,Mizoram
+5,Hnahthial,Mizoram
+50,Khairagarh-Chhuikhadan-Gandai,Chhattisgarh
+50,Sarangarh-Bilaigarh,Chhattisgarh
+50,Balod,Chhattisgarh
+50,Sakti,Chhattisgarh
+50,Balrampur-Ramanujganj,Chhattisgarh
+500,Palnadu,Andhra Pradesh
+501,Palwal,Haryana
+502,Panch Mahals,Gujarat
+503,Panchkula,Haryana
+504,Pandhurna,Madhya Pradesh
+505,Panipat,Haryana
+506,Panna,Madhya Pradesh
+507,Papum Pare,Arunachal Pradesh
+508,Parbhani,Maharashtra
+509,Parvathipuram Manyam,Andhra Pradesh
+51,Balodabazar-Bhatapara,Chhattisgarh
+510,Paschim Bardhaman,West Bengal
+511,Paschim Medinipur,West Bengal
+512,Pashchim Champaran,Bihar
+513,Patan,Gujarat
+514,Pathanamthitta,Kerala
+515,Pathankot,Punjab
+516,Patiala,Punjab
+517,Patna,Bihar
+518,Pauri Garhwal,Uttarakhand
+519,Perambalur,Tamil Nadu
+52,Balotra,Rajasthan
+522,Pherzawl,Manipur
+523,Pilibhit,Uttar Pradesh
+524,Pithoragarh,Uttarakhand
+525,Poonch,Jammu And Kashmir
+526,Porbandar,Gujarat
+527,Prakasam,Andhra Pradesh
+528,Pratapgarh,Uttar Pradesh
+529,Prayagraj,Uttar Pradesh
+53,Balrampur,Uttar Pradesh
+530,Puducherry,Puducherry
+531,Pudukkottai,Tamil Nadu
+532,Pulwama,Jammu And Kashmir
+533,Pune,Maharashtra
+534,Purba Bardhaman,West Bengal
+535,Purba Medinipur,West Bengal
+536,Purbi Champaran,Bihar
+537,Puri,Odisha
+538,Purnia,Bihar
+539,Purulia,West Bengal
+54,Banas Kantha,Gujarat
+540,Rae Bareli,Uttar Pradesh
+541,Raichur,Karnataka
+542,Raigad,Maharashtra
+543,Raigarh,Chhattisgarh
+544,Raipur,Chhattisgarh
+545,Raisen,Madhya Pradesh
+546,Rajgarh,Madhya Pradesh
+547,Rajkot,Gujarat
+548,Rajnandgaon,Chhattisgarh
+549,Rajouri,Jammu And Kashmir
+55,Banda,Uttar Pradesh
+550,Rajsamand,Rajasthan
+551,Ramanagara,Karnataka
+552,Ramanathapuram,Tamil Nadu
+553,Ramban,Jammu And Kashmir
+554,Ramgarh,Jharkhand
+555,Rampur,Uttar Pradesh
+556,Ranchi,Jharkhand
+557,Ranga Reddy,Telangana
+558,Ranipet,Tamil Nadu
+559,Ratlam,Madhya Pradesh
+56,Bandipora,Jammu And Kashmir
+560,Ratnagiri,Maharashtra
+561,Rayagada,Odisha
+562,Reasi,Jammu And Kashmir
+563,Rewa,Madhya Pradesh
+564,Rewari,Haryana
+565,Ri Bhoi,Meghalaya
+566,Rohtak,Haryana
+567,Rohtas,Bihar
+568,Rudra Prayag,Uttarakhand
+569,Rupnagar,Punjab
+57,Banka,Bihar
+570,S.A.S Nagar,Punjab
+571,Sabar Kantha,Gujarat
+572,Sagar,Madhya Pradesh
+573,Saharanpur,Uttar Pradesh
+574,Saharsa,Bihar
+575,Sahebganj,Jharkhand
+576,Saitual,Mizoram
+577,Salem,Tamil Nadu
+578,Salumbar,Rajasthan
+579,Samastipur,Bihar
+58,Bankura,West Bengal
+580,Samba,Jammu And Kashmir
+581,Sambalpur,Odisha
+582,Sambhal,Uttar Pradesh
+583,Sangareddy,Telangana
+584,Sangli,Maharashtra
+585,Sangrur,Punjab
+586,Sant Kabir Nagar,Uttar Pradesh
+587,Saraikela Kharsawan,Jharkhand
+588,Saran,Bihar
+589,Satara,Maharashtra
+59,Banswara,Rajasthan
+590,Satna,Madhya Pradesh
+591,Sawai Madhopur,Rajasthan
+592,Sehore,Madhya Pradesh
+593,Senapati,Manipur
+594,Seoni,Madhya Pradesh
+595,Sepahijala,Tripura
+596,Serchhip,Mizoram
+597,Shahdara,Delhi
+598,Shahdol,Madhya Pradesh
+599,Shahid Bhagat Singh Nagar,Punjab
+6,Ajmer,Rajasthan
+6,Phalodi,Rajasthan
+6,Deeg,Rajasthan
+60,Bapatla,Andhra Pradesh
+600,Shahjahanpur,Uttar Pradesh
+601,Shajapur,Madhya Pradesh
+603,Shamli,Uttar Pradesh
+604,Sheikhpura,Bihar
+605,Sheohar,Bihar
+606,Sheopur,Madhya Pradesh
+607,Shi Yomi,Arunachal Pradesh
+608,Shimla,Himachal Pradesh
+609,Shivamogga,Karnataka
+61,Bara Banki,Uttar Pradesh
+610,Shivpuri,Madhya Pradesh
+611,Shopian,Jammu And Kashmir
+612,Shrawasti,Uttar Pradesh
+613,Siaha,Mizoram
+614,Siang,Arunachal Pradesh
+615,Siddharthnagar,Uttar Pradesh
+616,Siddipet,Telangana
+617,Sidhi,Madhya Pradesh
+618,Sikar,Rajasthan
+619,Simdega,Jharkhand
+62,Baramulla,Jammu And Kashmir
+620,Sindhudurg,Maharashtra
+621,Singrauli,Madhya Pradesh
+622,Sirmaur,Himachal Pradesh
+623,Sirohi,Rajasthan
+624,Sirsa,Haryana
+625,Sitamarhi,Bihar
+626,Sitapur,Uttar Pradesh
+627,Sivaganga,Tamil Nadu
+628,Sivasagar,Assam
+629,Siwan,Bihar
+63,Baran,Rajasthan
+630,Solan,Himachal Pradesh
+631,Solapur,Maharashtra
+632,Sonbhadra,Uttar Pradesh
+633,Sonipat,Haryana
+634,Sonitpur,Assam
+635,Soreng,Sikkim
+636,South,Delhi
+637,South 24 Parganas,West Bengal
+638,South Andamans,Andaman And Nicobar Islands
+639,South East,Delhi
+64,Bareilly,Uttar Pradesh
+640,South Garo Hills,Meghalaya
+641,South Goa,Goa
+642,South Salmara Mancachar,Assam
+643,South Tripura,Tripura
+644,South West,Delhi
+645,South West Garo Hills,Meghalaya
+646,South West Khasi Hills,Meghalaya
+647,Sri Muktsar Sahib,Punjab
+648,Sri Potti Sriramulu Nellore,Andhra Pradesh
+649,Sri Sathya Sai,Andhra Pradesh
+65,Bargarh,Odisha
+650,Srikakulam,Andhra Pradesh
+651,Srinagar,Jammu And Kashmir
+652,Sukma,Chhattisgarh
+653,Sultanpur,Uttar Pradesh
+654,Sundargarh,Odisha
+655,Supaul,Bihar
+656,Surajpur,Chhattisgarh
+657,Surat,Gujarat
+658,Surendranagar,Gujarat
+659,Surguja,Chhattisgarh
+66,Barmer,Rajasthan
+660,Suryapet,Telangana
+661,Tamenglong,Manipur
+662,Tamulpur,Assam
+663,Tapi,Gujarat
+664,Tarn Taran,Punjab
+665,Tawang,Arunachal Pradesh
+666,Tehri Garhwal,Uttarakhand
+667,Tengnoupal,Manipur
+668,Tenkasi,Tamil Nadu
+669,Thane,Maharashtra
+67,Barnala,Punjab
+670,Thanjavur,Tamil Nadu
+671,The Nilgiris,Tamil Nadu
+672,Theni,Tamil Nadu
+673,Thiruvallur,Tamil Nadu
+674,Thiruvananthapuram,Kerala
+675,Thiruvarur,Tamil Nadu
+676,Thoothukkudi,Tamil Nadu
+677,Thoubal,Manipur
+678,Thrissur,Kerala
+679,Tikamgarh,Madhya Pradesh
+68,Barpeta,Assam
+680,Tinsukia,Assam
+681,Tirap,Arunachal Pradesh
+682,Tiruchirappalli,Tamil Nadu
+683,Tirunelveli,Tamil Nadu
+684,Tirupathur,Tamil Nadu
+685,Tirupati,Andhra Pradesh
+686,Tiruppur,Tamil Nadu
+687,Tiruvannamalai,Tamil Nadu
+688,Tonk,Rajasthan
+69,Barwani,Madhya Pradesh
+690,Tumakuru,Karnataka
+691,Udaipur,Rajasthan
+692,Udalguri,Assam
+693,Udam Singh Nagar,Uttarakhand
+693,Uttar Kashi,Uttarakhand
+694,Udhampur,Jammu And Kashmir
+695,Udupi,Karnataka
+696,Ujjain,Madhya Pradesh
+697,Ukhrul,Manipur
+698,Umaria,Madhya Pradesh
+699,Una,Himachal Pradesh
+7,Akola,Maharashtra
+70,Bastar,Chhattisgarh
+700,Unakoti,Tripura
+701,Unnao,Uttar Pradesh
+702,Upper Siang,Arunachal Pradesh
+703,Upper Subansiri,Arunachal Pradesh
+704,Uttar Dinajpur,West Bengal
+706,Uttara Kannada,Karnataka
+707,Vadodara,Gujarat
+708,Vaishali,Bihar
+709,Valsad,Gujarat
+71,Basti,Uttar Pradesh
+710,Varanasi,Uttar Pradesh
+711,Vellore,Tamil Nadu
+712,Vidisha,Madhya Pradesh
+713,Vijayanagara,Karnataka
+714,Vijayapura,Karnataka
+715,Vikarabad,Telangana
+716,Viluppuram,Tamil Nadu
+717,Virudhunagar,Tamil Nadu
+718,Visakhapatnam,Andhra Pradesh
+719,Vizianagaram,Andhra Pradesh
+72,Bathinda,Punjab
+720,Wanaparthy,Telangana
+721,Warangal,Telangana
+722,Wardha,Maharashtra
+723,Washim,Maharashtra
+724,Wayanad,Kerala
+725,West,Delhi
+726,West Garo Hills,Meghalaya
+727,West Godavari,Andhra Pradesh
+728,West Jaintia Hills,Meghalaya
+729,West Kameng,Arunachal Pradesh
+73,Beawar,Rajasthan
+730,West Karbi Anglong,Assam
+731,West Khasi Hills,Meghalaya
+732,West Siang,Arunachal Pradesh
+733,West Singhbhum,Jharkhand
+734,West Tripura,Tripura
+736,Yadadri Bhuvanagiri,Telangana
+737,Yadgir,Karnataka
+738,Yamunanagar,Haryana
+739,Yavatmal,Maharashtra
+74,Beed,Maharashtra
+744,Mauganj,Madhya Pradesh
+747,Anupgarh,Rajasthan
+748,Didwana-Kuchaman,Rajasthan
+75,Begusarai,Bihar
+749,Dudu,Rajasthan
+750,Gangapurcity,Rajasthan
+76,Belagavi,Karnataka
+751,Jaipur (Gramin),Rajasthan
+752,Jodhpur (Gramin),Rajasthan
+753,Kekri,Rajasthan
+754,Neem Ka Thana,Rajasthan
+755,Sanchore,Rajasthan
+756,Shahpura,Rajasthan
+757,Pakke Kessang,Arunachal Pradesh
+758,Deogarh,Odisha
+759,Sonepur,Odisha
+760,Manendragarh-Chirmiri-Bharatpur(M C B),Chhattisgarh
+762,Uttar Bastar Kanker,Chhattisgarh
+761,Mohla-Manpur-Ambagarh Chouki,Chhattisgarh
+77,Bemetara,Chhattisgarh
+763,Y.S.R.,Andhra Pradesh
+764,Jayashankar Bhupalapally,Telangana
+79,Bengaluru Urban,Karnataka
+78,Bengaluru Rural,Karnataka
+81,Bhadohi,Uttar Pradesh
+80,Betul,Madhya Pradesh
+8,Alappuzha,Kerala
+83,Bhadrak,Odisha
+82,Bhadradri Kothagudem,Telangana
+84,Bhagalpur,Bihar
+85,Bhandara,Maharashtra
+87,Bharuch,Gujarat
+86,Bharatpur,Rajasthan
+88,Bhavnagar,Gujarat
+89,Bhilwara,Rajasthan
+9,Aligarh,Uttar Pradesh
+91,Bhiwani,Haryana
+90,Bhind,Madhya Pradesh
+92,Bhojpur,Bihar
+93,Bhopal,Madhya Pradesh
+95,Bidar,Karnataka
+96,Bijapur,Chhattisgarh
+97,Bijnor,Uttar Pradesh
+99,Bilaspur,Chhattisgarh
+98,Bikaner,Rajasthan
+800,Chumoukedima,Nagaland
+801,Dimapur,Nagaland
+802,Kiphire,Nagaland
+803,Kohima,Nagaland
+804,Longleng,Nagaland
+805,Mokokchung,Nagaland
+806,Mon,Nagaland
+807,Niuland,Nagaland
+808,Noklak,Nagaland
+809,Peren,Nagaland
+810,Phek,Nagaland
+811,Shamator,Nagaland
+812,Tseminyu,Nagaland
+813,Tuensang,Nagaland
+814,Wokha,Nagaland
+815,Zunheboto,Nagaland
+900,Kargil,Ladakh
+901,Leh Ladakh,Ladakh
+950,Dadra And Nagar Haveli,The Dadra And Nagar Haveli And Daman And Diu
+951,Daman,The Dadra And Nagar Haveli And Daman And Diu
+952,Diu,The Dadra And Nagar Haveli And Daman And Diu
+953,Lakshadweep District,Lakshadweep
