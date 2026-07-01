@@ -241,13 +241,14 @@ def _render_records_workspace(records):
         st.session_state['vr_sig'] = signature
         st.session_state['vr_page'] = 1
 
-    # download CSV of the current filtered view
+    # download CSV of the whole current filtered view ("Select All" / Download All)
     if filtered:
-        csv_bytes = _build_grid_df(filtered, 0).to_csv(index=False).encode('utf-8')
+        csv_bytes = _build_export_df(filtered).to_csv(index=False).encode('utf-8')
         sc3.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-        sc3.download_button("⬇️ Download CSV", data=csv_bytes,
-                            file_name=f"patient_records_{datetime.now().strftime('%Y%m%d')}.csv",
-                            mime="text/csv", use_container_width=True, key="vr_csv")
+        sc3.download_button("⬇️ Download All", data=csv_bytes,
+                            file_name=f"patient_records_all_{datetime.now().strftime('%Y%m%d')}.csv",
+                            mime="text/csv", use_container_width=True, key="vr_csv",
+                            help="Download every patient in the current filter (Select All).")
 
     if not filtered:
         st.info("No records match the current filters. Try clearing the search or filters.")
@@ -266,7 +267,7 @@ def _render_records_workspace(records):
     grid_df = _build_grid_df(page_recs, start)
     event = st.dataframe(
         grid_df, use_container_width=True, hide_index=True, height=560,
-        on_select="rerun", selection_mode="single-row", key=f"vr_grid_p{page}",
+        on_select="rerun", selection_mode="multi-row", key=f"vr_grid_p{page}",
         column_config={
             "#": st.column_config.NumberColumn("#", width="small"),
             "Status": st.column_config.TextColumn("Status", width="small"),
@@ -276,7 +277,7 @@ def _render_records_workspace(records):
 
     _render_pager(page, pages, total_f, start, len(page_recs))
 
-    # --- action bar for the selected row ---------------------------------
+    # --- selection: drive per-patient actions and selected-CSV download ---
     selected_rows = []
     sel = getattr(event, "selection", None)
     if sel is not None:
@@ -284,13 +285,25 @@ def _render_records_workspace(records):
         if selected_rows is None and isinstance(sel, dict):
             selected_rows = sel.get("rows", [])
     selected_rows = selected_rows or []
+    selected_recs = [page_recs[i] for i in selected_rows if 0 <= i < len(page_recs)]
 
-    if selected_rows:
+    if len(selected_recs) > 1:
+        # Multiple patients selected -> download just those.
+        sel_csv = _build_export_df(selected_recs).to_csv(index=False).encode('utf-8')
+        st.download_button(
+            f"⬇️ Download Selected ({len(selected_recs)})", data=sel_csv,
+            file_name=f"patient_records_selected_{datetime.now().strftime('%Y%m%d')}.csv",
+            mime="text/csv", key="vr_csv_selected")
+        st.caption(f"✅ {len(selected_recs)} patients selected. Select a single row to "
+                   "View / Edit / Update DR / Delete / Download one patient.")
+    elif len(selected_recs) == 1:
+        # Single patient -> full action bar (includes a per-patient CSV download).
         idx = selected_rows[0]
         if 0 <= idx < len(page_ids):
             _render_action_bar(page_recs[idx], page_ids[idx])
     else:
-        st.caption("👆 Select a row above to act on that patient.")
+        st.caption("👆 Select one row to act on a patient, or tick multiple rows to "
+                   "download a subset. Use **Download All** for everyone.")
 
 
 def _apply_filters(records, status, search, sel_hosp, sel_dept, use_date, date_from, date_to):
@@ -352,6 +365,51 @@ def _build_grid_df(recs, start_index):
     ])
 
 
+def _build_export_df(recs):
+    """CSV-export rows (one row per patient): ICMR-specified column order plus
+    the Top 5 predicted viruses with their probabilities. The Top 5 values are
+    already stored on each record (top_1_virus/top_1_confidence ... top_5_*),
+    so this only formats existing data — no recompute, no model access."""
+    rows = []
+    for r in recs:
+        row = {
+            "Date of Collection": r.get('date_of_collection') or "—",
+            "Patient MRD ID": r.get('patient_mrd_id') or "—",
+            "Hospital": r.get('hospital') or "—",
+            "Patient Study ID": r.get('patient_study_id') or "—",
+            "Department": r.get('department') or "—",
+            "Date of Admission": r.get('date_of_admission') or "—",
+            "Patient Name": _patient_name(r) or "—",
+            "Address": r.get('address_line') or r.get('address') or "—",
+            "Mobile No": r.get('mobile_no') or "—",
+            "Lab ID": r.get('lab_id') or "",
+            "Age": r.get('age') if r.get('age') not in (None, "") else "—",
+            "Sex": r.get('sex') or "—",
+            "Patient Type": r.get('patient_type') or "—",
+            "Onset of Illness": r.get('onset_of_illness') or "—",
+            "Duration of Illness (days)": r.get('duration_of_illness_days')
+                if r.get('duration_of_illness_days') not in (None, "") else "—",
+        }
+        
+        # Top 5 predictions, ranked, with probability percentages.
+        for n in range(1, 6):
+            conf = r.get(f'top_{n}_confidence')
+            try:
+                conf_str = f"{float(conf):.2f}" if conf not in (None, "") else "—"
+            except (TypeError, ValueError):
+                conf_str = "—"
+            row[f"Top {n} Virus"] = r.get(f'top_{n}_virus') or "—"
+            row[f"Top {n} Probability (%)"] = conf_str
+        rows.append(row)
+
+    cols = ["Date of Collection", "Patient MRD ID", "Hospital", "Patient Study ID",
+            "Department", "Date of Admission", "Patient Name", "Address", "Mobile No", "Lab ID",
+            "Age", "Sex", "Patient Type", "Onset of Illness", "Duration of Illness (days)"]
+    for n in range(1, 6):
+        cols += [f"Top {n} Virus", f"Top {n} Probability (%)"]
+    return pd.DataFrame(rows, columns=cols)
+
+
 def _render_pager(page, pages, total_f, start, page_count):
     c1, c2, c3 = st.columns([1, 2, 1])
     c1.button("⬅️ Prev", disabled=(page <= 1), use_container_width=True,
@@ -370,7 +428,7 @@ def _render_action_bar(rec, rid):
     st.markdown("---")
     badge = "🟢 Completed" if _is_completed(rec) else "🔴 Pending"
     st.markdown(f"**Selected patient:** `{_identifier(rec)}`  ·  Status: {badge}")
-    b1, b2, b3, b4 = st.columns(4)
+    b1, b2, b3, b4, b5 = st.columns(5)
     b1.button("👁️ View", use_container_width=True, on_click=_open_action,
               args=("view", rid), key=f"act_view_{rid}")
     b2.button("✏️ Edit", use_container_width=True, on_click=_open_action,
@@ -379,6 +437,10 @@ def _render_action_bar(rec, rid):
               args=("updatedr", rid), key=f"act_dr_{rid}")
     b4.button("🗑️ Delete", use_container_width=True, on_click=_open_action,
               args=("delete", rid), key=f"act_del_{rid}")
+    patient_csv = _build_export_df([rec]).to_csv(index=False).encode('utf-8')
+    b5.download_button("⬇️ CSV", data=patient_csv,
+                       file_name=f"patient_{_identifier(rec)}_{datetime.now().strftime('%Y%m%d')}.csv",
+                       mime="text/csv", use_container_width=True, key=f"act_csv_{rid}")
 
 
 # ---------------------------------------------------------------------------
