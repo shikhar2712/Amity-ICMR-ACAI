@@ -57,7 +57,44 @@ class DataHandler:
             # Fallback to timestamp-based ID
             import time
             return f"P{int(time.time())}"
-    
+
+    def _hospital_prefix(self, hospital: str) -> str:
+        """Map a hospital to its Study ID prefix (MMC -> M, TMC -> T).
+        Hospitals not in the map fall back to their first alphabetic character.
+        Extend this map if two hospitals would otherwise share a first letter."""
+        prefixes = {'MMC': 'M', 'TMC': 'T'}
+        if not hospital or hospital == 'Select...':
+            return ''
+        if hospital in prefixes:
+            return prefixes[hospital]
+        for ch in hospital:
+            if ch.isalpha():
+                return ch.upper()
+        return ''
+
+    def _get_next_study_id(self, hospital: str) -> str:
+        """Generate a hospital-based Patient Study ID (MMC -> M01, TMC -> T01, ...).
+        Each hospital uses its own atomic counter so numbers increment
+        independently and never collide. Returns '' if no valid hospital."""
+        try:
+            if self.db is None:
+                return ''
+            prefix = self._hospital_prefix(hospital)
+            if not prefix:
+                return ''
+            counters = self.db['counters']
+            result = counters.find_one_and_update(
+                {'_id': f'study_id_{prefix}'},
+                {'$inc': {'sequence_value': 1}},
+                upsert=True,
+                return_document=True
+            )
+            sequence_num = result.get('sequence_value', 1)
+            return f"{prefix}{sequence_num:02d}"
+        except Exception as e:
+            logger.error(f"Error generating study ID for hospital '{hospital}': {e}")
+            return ''
+
     def _create_indexes(self):
         """Create database indexes for better performance"""
         try:
@@ -122,6 +159,8 @@ class DataHandler:
             
             # Generate unique patient ID
             patient_id = self._get_next_patient_id()
+            # Generate hospital-based Patient Study ID (MMC -> M01, TMC -> T01, ...).
+            study_id = self._get_next_study_id(patient_data.get('hospital', ''))
             
             # Transform patient data to human-readable format
             readable_patient_info = {
@@ -129,7 +168,7 @@ class DataHandler:
                 'patient_name': patient_data.get('patient_name', ''),
                 # Keep core patient administrative fields first (matching app input order)
                 'date_of_collection': patient_data.get('date_of_collection', ''),
-                'patient_study_id': patient_data.get('patient_study_id', ''),
+                'patient_study_id': study_id or patient_data.get('patient_study_id', ''),
                 'patient_mrd_id': patient_data.get('patient_mrd_id', ''),
                 'hospital': patient_data.get('hospital', ''),
                 'department': patient_data.get('department', ''),
