@@ -65,6 +65,12 @@ def _identifier(rec):
             or rec.get('patient_id') or "—")
 
 
+def _patient_name(rec):
+    """Patient name for display. Falls back to the legacy 'Patient Study ID'
+    field so records enrolled before the rename still show a label."""
+    return rec.get('patient_name') or rec.get('patient_study_id')
+
+
 def _is_completed(rec):
     return bool(rec.get('doctor_lab_submitted_at'))
 
@@ -202,7 +208,7 @@ def _render_records_workspace(records):
     # --- search + sort + download ----------------------------------------
     sc1, sc2, sc3 = st.columns([2, 1.3, 1])
     search = sc1.text_input("🔍 Search", key="vr_search",
-                            placeholder="Patient ID / Study ID / MRD").strip().lower()
+                            placeholder="Patient ID / Name / MRD").strip().lower()
     sort_by = sc2.selectbox(
         "Sort by",
         ["Newest first", "Oldest first", "Patient ID (A–Z)", "Pending first", "Completed first"],
@@ -301,7 +307,8 @@ def _apply_filters(records, status, search, sel_hosp, sel_dept, use_date, date_f
             continue
         if search:
             haystack = " ".join(str(r.get(k, '')) for k in
-                                ('patient_id_no', 'patient_study_id', 'patient_mrd_id', 'patient_id')).lower()
+                                ('patient_id_no', 'patient_study_id', 'patient_mrd_id',
+                                 'patient_id', 'patient_name')).lower()
             if search not in haystack:
                 continue
         if use_date and date_from and date_to:
@@ -331,7 +338,7 @@ def _build_grid_df(recs, start_index):
         rows.append({
             "#": i,
             "Patient ID No.": _identifier(r),
-            "Study ID": r.get('patient_study_id') or "—",
+            "Patient Name": _patient_name(r) or "—",
             "Age": r.get('age') if r.get('age') not in (None, "") else "—",
             "Sex": r.get('sex') or "—",
             "Date of Collection": r.get('date_of_collection') or "—",
@@ -340,7 +347,7 @@ def _build_grid_df(recs, start_index):
             "Status": "🟢 Completed" if _is_completed(r) else "🔴 Pending",
         })
     return pd.DataFrame(rows, columns=[
-        "#", "Patient ID No.", "Study ID", "Age", "Sex",
+        "#", "Patient ID No.", "Patient Name", "Age", "Sex",
         "Date of Collection", "Date of Admission", "Predicted Virus", "Status",
     ])
 
@@ -401,7 +408,7 @@ def _render_view_detail(rec):
     st.markdown("##### Patient & administrative")
     admin = {
         "Patient ID No.": _identifier(rec), "Record ID": rec.get('patient_id'),
-        "Study ID": rec.get('patient_study_id'), "MRD ID": rec.get('patient_mrd_id'),
+        "Patient Name": _patient_name(rec), "MRD ID": rec.get('patient_mrd_id'),
         "Hospital": rec.get('hospital'), "Department": rec.get('department'),
         "Department (specify)": rec.get('department_specification'),
         "Date of Collection": rec.get('date_of_collection'),
@@ -458,7 +465,7 @@ def _render_edit_form(rec):
         c1, c2 = st.columns(2)
         with c1:
             pid_no = st.text_input("Patient ID No.", value=rec.get('patient_id_no') or "")
-            study_id = st.text_input("Patient Study ID", value=rec.get('patient_study_id') or "")
+            patient_name = st.text_input("Patient Name", value=_patient_name(rec) or "")
             mrd_id = st.text_input("Patient MRD ID", value=rec.get('patient_mrd_id') or "")
             hospital = st.selectbox("Hospital", hosp_opts,
                                     index=hosp_opts.index(rec['hospital']) if rec.get('hospital') in hosp_opts else 0)
@@ -478,7 +485,7 @@ def _render_edit_form(rec):
 
         if st.form_submit_button("💾 Save changes", type="primary", use_container_width=True):
             fields = {
-                'patient_id_no': pid_no.strip(), 'patient_study_id': study_id.strip(),
+                'patient_id_no': pid_no.strip(), 'patient_name': patient_name.strip(),
                 'patient_mrd_id': mrd_id.strip(), 'hospital': hospital, 'department': dept,
                 'department_specification': dept_spec.strip() if dept == "Other" else "",
                 'age': int(age), 'sex': sex, 'patient_type': ptype, 'mobile_no': mobile.strip(),
@@ -525,7 +532,7 @@ def _render_update_dr_form(rec):
 def _render_delete_confirm(rec):
     st.subheader("🗑️ Delete record (soft delete)")
     st.warning(f"This hides Patient **{_identifier(rec)}** "
-               f"(Study ID: {rec.get('patient_study_id') or '—'}) from the dashboard and "
+               f"(Name: {_patient_name(rec) or '—'}) from the dashboard and "
                f"records list. The data is kept in the database and can be restored by an admin.")
     c1, c2 = st.columns(2)
     if c1.button("🗑️ Confirm delete", type="primary", use_container_width=True, key=f"confirm_del_{rec['_id']}"):
