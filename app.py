@@ -253,6 +253,27 @@ def main():
             st.write("")  # Skip if image not found
 
     # --- Sidebar navigation: clickable buttons, no radio circles -----------
+    # Adjustable positioning for the nav title + buttons. Edit the values
+    # below to move things - see the comment on each line for what it does.
+    st.markdown(
+        """
+        <style>
+        /* "Navigation" title: margin-top/bottom = space above/below it */
+        section[data-testid="stSidebar"] h1 {
+            margin-top: 0px;      /* + moves title down, - moves it up */
+            margin-bottom: 8px;   /* space between title and first button */
+        }
+        /* Each nav button (Dashboard / Prediction / View Records / About) */
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button {
+            justify-content: flex-start;  /* text align: flex-start=left, center=center, flex-end=right */
+            padding-left: 16px;           /* + moves text further right, 0 = flush left */
+            margin-top: 2px;              /* space above each button (vertical spacing) */
+            margin-bottom: 2px;           /* space below each button (vertical spacing) */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     st.sidebar.title("Navigation")
     NAV_ITEMS = [
         ("Dashboard", "Dashboard"),
