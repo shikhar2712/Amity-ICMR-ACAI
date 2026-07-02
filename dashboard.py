@@ -83,8 +83,11 @@ def _parse_ddmmyyyy(value):
 
 
 def _set_nav(page_name):
-    """Callback: switch the sidebar radio to another page (safe inside callbacks)."""
+    """Callback: switch to another page (safe inside callbacks) and trigger
+    the same smooth auto-scroll used by the sidebar nav buttons, so jumping
+    here via "New Case" etc. feels identical to clicking the sidebar."""
     st.session_state['navigation_page'] = page_name
+    st.session_state['_scroll_to_page'] = True
 
 
 def _open_action(action, record_id):
