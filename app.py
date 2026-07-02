@@ -120,19 +120,24 @@ def widget_key(name: str) -> str:
 
 
 def main():
-    # --- Floating Home icon: fixed to the very top-left of the browser -----
-    # Fragile-by-nature: relies on Streamlit's current DOM structure via the
-    # st.container `key` -> CSS class hook. If a future Streamlit version
-    # changes this internal structure, the icon may need its selector updated.
+    # --- Floating Home icon: docked beside Streamlit's own sidebar arrow ---
+    # The static top-left corner is where Streamlit puts its own sidebar
+    # collapse/expand arrow, so a fixed pixel position overlaps and steals
+    # clicks from it in both sidebar states. Instead, JS finds that arrow's
+    # actual on-screen position (expanded or collapsed) and docks our icon
+    # immediately to its right, re-checking continuously so toggling the
+    # sidebar (a pure client-side action Streamlit doesn't rerun for) keeps
+    # the icon correctly placed and never overlapping.
     st.markdown(
         """
         <style>
         .st-key-home_icon_container {
             position: fixed;
             top: 14px;
-            left: 14px;
+            left: 60px;
             z-index: 999999;
             width: auto !important;
+            transition: left 0.15s ease, top 0.15s ease;
         }
         .st-key-home_icon_container button {
             border-radius: 50%;
@@ -155,6 +160,52 @@ def main():
             st.session_state['navigation_page'] = 'Home'
             st.session_state['_scroll_to_page'] = True
             st.rerun()
+
+    components.html(
+        """
+        <script>
+        (function() {
+            function findArrow(doc) {
+                return doc.querySelector('[data-testid="stSidebarCollapsedControl"]')
+                    || doc.querySelector('[data-testid="stSidebarCollapseButton"]')
+                    || doc.querySelector('[data-testid="collapsedControl"]');
+            }
+            function positionHomeIcon() {
+                try {
+                    const doc = window.parent.document;
+                    const arrow = findArrow(doc);
+                    const homeBox = doc.querySelector('.st-key-home_icon_container');
+                    if (!homeBox) return;
+                    if (arrow) {
+                        const rect = arrow.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            homeBox.style.top = rect.top + 'px';
+                            homeBox.style.left = (rect.right + 10) + 'px';
+                            return;
+                        }
+                    }
+                    // Arrow not found (older/newer Streamlit build) - safe fallback
+                    // that still won't sit exactly in the corner Streamlit itself uses.
+                    homeBox.style.top = '14px';
+                    homeBox.style.left = '60px';
+                } catch (e) { /* cross-origin or timing issue - ignore, retry will fix it */ }
+            }
+            positionHomeIcon();
+            [50, 150, 300, 600, 1200].forEach(function (ms) {
+                setTimeout(positionHomeIcon, ms);
+            });
+            try {
+                const obs = new MutationObserver(positionHomeIcon);
+                obs.observe(window.parent.document.body, {
+                    attributes: true, childList: true, subtree: true,
+                });
+                window.parent.addEventListener('resize', positionHomeIcon);
+            } catch (e) { /* ignore */ }
+        })();
+        </script>
+        """,
+        height=0,
+    )
 
     # Top logos
     col1, col2, col3 = st.columns([1, 3, 1])
