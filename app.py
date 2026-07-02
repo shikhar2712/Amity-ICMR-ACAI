@@ -120,36 +120,26 @@ def widget_key(name: str) -> str:
 
 
 def main():
-    # --- Floating Home icon: docked beside Streamlit's own sidebar arrow ---
-    # The static top-left corner is where Streamlit puts its own sidebar
-    # collapse/expand arrow, so a fixed pixel position overlaps and steals
-    # clicks from it in both sidebar states. Instead, JS finds that arrow's
-    # actual on-screen position (expanded or collapsed) and docks our icon
-    # immediately to its right, re-checking continuously so toggling the
-    # sidebar (a pure client-side action Streamlit doesn't rerun for) keeps
-    # the icon correctly placed and never overlapping.
+    # --- Floating Home icon: lives in document.body, immune to sidebar anim -
+    # Streamlit applies a CSS transform to the sidebar/content area while it
+    # slides open/closed. Any element with position:fixed nested inside a
+    # transformed ancestor stops being fixed to the *viewport* and becomes
+    # fixed to that ancestor instead - which is why the icon disappeared with
+    # the sidebar. Fix: keep the real st.button (needed for the Python click
+    # callback) but hide it off-screen, and inject a completely separate
+    # visible icon directly into <body> - outside any Streamlit-managed
+    # element - that simply .click()'s the real hidden button when pressed.
     st.markdown(
         """
         <style>
+        /* Real Streamlit button: kept functional, not visible anywhere */
         .st-key-home_icon_container {
-            position: fixed;
-            top: 14px;
-            left: 60px;
-            z-index: 999999;
-            width: auto !important;
-            transition: left 0.15s ease, top 0.15s ease;
-        }
-        .st-key-home_icon_container button {
-            border-radius: 50%;
-            width: 46px;
-            height: 46px;
-            font-size: 20px;
-            padding: 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            transition: transform 0.15s ease;
-        }
-        .st-key-home_icon_container button:hover {
-            transform: scale(1.08);
+            position: absolute !important;
+            left: -9999px !important;
+            top: -9999px !important;
+            width: 1px !important;
+            height: 1px !important;
+            overflow: hidden !important;
         }
         </style>
         """,
@@ -170,26 +160,63 @@ def main():
                     || doc.querySelector('[data-testid="stSidebarCollapseButton"]')
                     || doc.querySelector('[data-testid="collapsedControl"]');
             }
+
+            function ensureIcon(doc) {
+                let icon = doc.getElementById('custom-home-icon');
+                if (icon) return icon;
+                icon = doc.createElement('button');
+                icon.id = 'custom-home-icon';
+                icon.type = 'button';
+                icon.innerHTML = '🏠';
+                icon.title = 'Back to Home';
+                Object.assign(icon.style, {
+                    position: 'fixed',
+                    top: '14px',
+                    left: '60px',
+                    zIndex: '999999',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: '#ffffff',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0',
+                    transition: 'left 0.15s ease, top 0.15s ease, transform 0.15s ease',
+                });
+                icon.onmouseenter = function () { icon.style.transform = 'scale(1.08)'; };
+                icon.onmouseleave = function () { icon.style.transform = 'scale(1)'; };
+                icon.onclick = function () {
+                    const realBtn = doc.querySelector('.st-key-home_icon_container button');
+                    if (realBtn) { realBtn.click(); }
+                };
+                doc.body.appendChild(icon);
+                return icon;
+            }
+
             function positionHomeIcon() {
                 try {
                     const doc = window.parent.document;
+                    const icon = ensureIcon(doc);
                     const arrow = findArrow(doc);
-                    const homeBox = doc.querySelector('.st-key-home_icon_container');
-                    if (!homeBox) return;
                     if (arrow) {
                         const rect = arrow.getBoundingClientRect();
                         if (rect.width > 0 && rect.height > 0) {
-                            homeBox.style.top = rect.top + 'px';
-                            homeBox.style.left = (rect.right + 21) + 'px';
+                            icon.style.top = rect.top + 'px';
+                            icon.style.left = (rect.right + 10) + 'px';
                             return;
                         }
                     }
-                    // Arrow not found (older/newer Streamlit build) - safe fallback
-                    // that still won't sit exactly in the corner Streamlit itself uses.
-                    homeBox.style.top = '14px';
-                    homeBox.style.left = '60px';
-                } catch (e) { /* cross-origin or timing issue - ignore, retry will fix it */ }
+                    // Arrow not found (older/newer Streamlit build) - safe fallback.
+                    icon.style.top = '14px';
+                    icon.style.left = '60px';
+                } catch (e) { /* cross-origin or timing issue - retry will fix it */ }
             }
+
             positionHomeIcon();
             [50, 150, 300, 600, 1200].forEach(function (ms) {
                 setTimeout(positionHomeIcon, ms);
