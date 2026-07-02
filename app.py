@@ -180,7 +180,7 @@ def main():
                         const rect = arrow.getBoundingClientRect();
                         if (rect.width > 0 && rect.height > 0) {
                             homeBox.style.top = rect.top + 'px';
-                            homeBox.style.left = (rect.right + 15) + 'px';
+                            homeBox.style.left = (rect.right + 21) + 'px';
                             return;
                         }
                     }
