@@ -120,6 +120,42 @@ def widget_key(name: str) -> str:
 
 
 def main():
+    # --- Floating Home icon: fixed to the very top-left of the browser -----
+    # Fragile-by-nature: relies on Streamlit's current DOM structure via the
+    # st.container `key` -> CSS class hook. If a future Streamlit version
+    # changes this internal structure, the icon may need its selector updated.
+    st.markdown(
+        """
+        <style>
+        .st-key-home_icon_container {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 999999;
+            width: auto !important;
+        }
+        .st-key-home_icon_container button {
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            font-size: 20px;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: transform 0.15s ease;
+        }
+        .st-key-home_icon_container button:hover {
+            transform: scale(1.08);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    with st.container(key="home_icon_container"):
+        if st.button("🏠", key="home_icon_btn", help="Back to Home"):
+            st.session_state['navigation_page'] = 'Home'
+            st.session_state['_scroll_to_page'] = True
+            st.rerun()
+
     # Top logos
     col1, col2, col3 = st.columns([1, 3, 1])
     with col1:
@@ -137,32 +173,6 @@ def main():
             st.image("logo_2.jpeg", width=250)
         except:
             st.write("")  # Skip if image not found
-
-    # --- Home: fixed pane shown above every page (not a nav option) --------
-    with st.container(border=True):
-        st.markdown(
-            "<h1 style='text-align: center;'>🦠 Virus Detection and Classification System</h1>",
-            unsafe_allow_html=True)
-        st.markdown(
-            "<h2 style='text-align: center;'>Advanced AI-Powered Diagnostic Tool for Viral Infections</h2>",
-            unsafe_allow_html=True)
-        st.write("""
-        Welcome to the Virus Detection and Classification System!
-        
-        This advanced AI-driven system assists healthcare professionals by analyzing patient symptoms 
-        and demographic information to predict the most probable viral infection from a comprehensive 
-        database of 26+ virus categories.
-        
-        **Key Features:**
-        - **Dual-Model Architecture**: Primary classification for major virus categories and secondary classification for "Other Viruses"
-        - **Comprehensive Symptom Analysis**: Covers neurological, gastrointestinal, respiratory, dermatological, and systemic symptoms
-        - **Geo-temporal Intelligence**: Incorporates seasonal patterns and geographical factors
-        - **Real-time Predictions**: Instant probability scores and confidence metrics
-        
-        Navigate to the **Prediction/Test Recommendation** page using the sidebar to input patient details 
-        and get comprehensive virus classification results.
-        """)
-        st.warning("**Medical Disclaimer**: This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or advice. Always consult qualified medical personnel for patient care decisions.")
 
     # --- Sidebar navigation: clickable buttons, no radio circles -----------
     st.sidebar.title("Navigation")
@@ -187,8 +197,9 @@ def main():
 
     page = st.session_state['navigation_page']
 
-    # Anchor the routed page content sits right below; jumping here skips
-    # past the Home panel so the clicked section is what the user actually sees.
+    # Anchor at the very top of whichever page is showing; jumping here on
+    # every navigation (including Home) is what makes each section land at
+    # the top of the viewport instead of wherever the user was scrolled to.
     st.markdown("<div id='page-content-anchor'></div>", unsafe_allow_html=True)
     if st.session_state.pop('_scroll_to_page', False):
         components.html(
@@ -203,7 +214,32 @@ def main():
             height=0,
         )
 
-    if page == "Dashboard":
+    if page == "Home":
+        st.markdown(
+            "<h1 style='text-align: center;'>🦠 Virus Detection and Classification System</h1>",
+            unsafe_allow_html=True)
+        st.markdown(
+            "<h2 style='text-align: center;'>Advanced AI-Powered Diagnostic Tool for Viral Infections</h2>",
+            unsafe_allow_html=True)
+        st.write("""
+        Welcome to the Virus Detection and Classification System!
+        
+        This advanced AI-driven system assists healthcare professionals by analyzing patient symptoms 
+        and demographic information to predict the most probable viral infection from a comprehensive 
+        database of 26+ virus categories.
+        
+        **Key Features:**
+        - **Dual-Model Architecture**: Primary classification for major virus categories and secondary classification for "Other Viruses"
+        - **Comprehensive Symptom Analysis**: Covers neurological, gastrointestinal, respiratory, dermatological, and systemic symptoms
+        - **Geo-temporal Intelligence**: Incorporates seasonal patterns and geographical factors
+        - **Real-time Predictions**: Instant probability scores and confidence metrics
+        
+        Navigate to the **Prediction/Test Recommendation** page using the sidebar to input patient details 
+        and get comprehensive virus classification results.
+        """)
+        st.warning("**Medical Disclaimer**: This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or advice. Always consult qualified medical personnel for patient care decisions.")
+
+    elif page == "Dashboard":
         render_dashboard_page()
 
     elif page == "View Records":
