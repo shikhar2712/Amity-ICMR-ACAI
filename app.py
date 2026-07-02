@@ -261,7 +261,7 @@ def main():
         /* "Navigation" title: margin-top/bottom = space above/below it */
         section[data-testid="stSidebar"] h1 {
             margin-top: 0px;      /* + moves title down, - moves it up */
-            margin-bottom: 40px;   /* space between title and first button */
+            margin-bottom: 60px;   /* space between title and first button */
         }
         /* Each nav button (Dashboard / Prediction / View Records / About) */
         section[data-testid="stSidebar"] div[data-testid="stButton"] button {
