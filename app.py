@@ -137,12 +137,8 @@ def main():
         except:
             st.write("")  # Skip if image not found
 
-    # Sidebar navigation
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to:", [
-                            "Home", "Prediction", "Dashboard", "View Records", "About"], key='navigation_page')
-
-    if page == "Home":
+    # --- Home: fixed pane shown above every page (not a nav option) --------
+    with st.container(border=True):
         st.markdown(
             "<h1 style='text-align: center;'>🦠 Virus Detection and Classification System</h1>",
             unsafe_allow_html=True)
@@ -162,12 +158,34 @@ def main():
         - **Geo-temporal Intelligence**: Incorporates seasonal patterns and geographical factors
         - **Real-time Predictions**: Instant probability scores and confidence metrics
         
-        Navigate to the **Prediction** page using the sidebar to input patient details 
+        Navigate to the **Prediction/Test Recommendation** page using the sidebar to input patient details 
         and get comprehensive virus classification results.
         """)
         st.warning("**Medical Disclaimer**: This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or advice. Always consult qualified medical personnel for patient care decisions.")
 
-    elif page == "Dashboard":
+    # --- Sidebar navigation: clickable buttons, no radio circles -----------
+    st.sidebar.title("Navigation")
+    NAV_ITEMS = [
+        ("Dashboard", "Dashboard"),
+        ("Prediction/Test Recommendation", "Prediction"),
+        ("View Records", "View Records"),
+        ("About", "About"),
+    ]
+    if 'navigation_page' not in st.session_state:
+        st.session_state['navigation_page'] = 'Dashboard'
+
+    for label, page_key in NAV_ITEMS:
+        is_active = st.session_state['navigation_page'] == page_key
+        if st.sidebar.button(
+            label, key=f"nav_btn_{page_key}", use_container_width=True,
+            type="primary" if is_active else "secondary",
+        ):
+            st.session_state['navigation_page'] = page_key
+            st.rerun()
+
+    page = st.session_state['navigation_page']
+
+    if page == "Dashboard":
         render_dashboard_page()
 
     elif page == "View Records":
