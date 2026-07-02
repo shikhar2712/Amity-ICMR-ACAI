@@ -261,7 +261,7 @@ def main():
         ("About", "About"),
     ]
     if 'navigation_page' not in st.session_state:
-        st.session_state['navigation_page'] = 'Dashboard'
+        st.session_state['navigation_page'] = 'Home'
 
     for label, page_key in NAV_ITEMS:
         is_active = st.session_state['navigation_page'] == page_key
