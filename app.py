@@ -6,6 +6,7 @@ from data_handler import (
     get_prediction_stats,
 )
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -181,9 +182,26 @@ def main():
             type="primary" if is_active else "secondary",
         ):
             st.session_state['navigation_page'] = page_key
+            st.session_state['_scroll_to_page'] = True
             st.rerun()
 
     page = st.session_state['navigation_page']
+
+    # Anchor the routed page content sits right below; jumping here skips
+    # past the Home panel so the clicked section is what the user actually sees.
+    st.markdown("<div id='page-content-anchor'></div>", unsafe_allow_html=True)
+    if st.session_state.pop('_scroll_to_page', False):
+        components.html(
+            """
+            <script>
+                const target = window.parent.document.getElementById('page-content-anchor');
+                if (target) {
+                    target.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }
+            </script>
+            """,
+            height=0,
+        )
 
     if page == "Dashboard":
         render_dashboard_page()
