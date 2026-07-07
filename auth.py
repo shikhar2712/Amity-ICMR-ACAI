@@ -32,7 +32,6 @@ from urllib.parse import quote
 
 import jwt
 import streamlit as st
-import streamlit.components.v1 as components
 from streamlit_js_eval import streamlit_js_eval
 
 
@@ -106,17 +105,27 @@ def _fetch_browser_session_token(config: dict):
     redirect, or returned in a session that's still valid).
 
     Returns:
-        None            -- the browser-side check hasn't reported back yet
+        None             -- the browser-side check hasn't reported back yet
         "__no_session__" -- Clerk loaded and confirmed there is no active session
-        <token string>  -- an active session's token, ready to verify
+        "__load_error__" -- the Clerk script failed to load (network/ad-blocker/etc.)
+        <token string>   -- an active session's token, ready to verify
+
+    "__load_error__" is treated the same as "__no_session__" by the caller --
+    without a loaded SDK we can't auto-detect an existing session, but the
+    sign-in link itself doesn't depend on the SDK, so the visitor can still
+    sign in manually.
     """
     js = f"""
     (async () => {{
-        {_clerk_loader_js(config)}
-        if (window.Clerk.session) {{
-            return await window.Clerk.session.getToken();
+        try {{
+            {_clerk_loader_js(config)}
+            if (window.Clerk.session) {{
+                return await window.Clerk.session.getToken();
+            }}
+            return "__no_session__";
+        }} catch (e) {{
+            return "__load_error__";
         }}
-        return "__no_session__";
     }})()
     """
     return streamlit_js_eval(js_expressions=js, key='clerk_session_check')
@@ -134,27 +143,27 @@ def _sign_out_in_browser(config: dict):
 
 
 def _render_sign_in_screen(config: dict):
+    # NOTE: this must be a native st.link_button, not a link embedded via
+    # st.components.v1.html(). Streamlit renders components.html() content in
+    # a sandboxed iframe without the allow-top-navigation flag, so a plain
+    # <a target="_top"> click gets silently blocked by the browser -- it looks
+    # like the "Sign in" button does nothing. st.link_button renders directly
+    # in the real page (no sandboxed iframe), so it isn't affected.
     sign_in_url = f"{config['sign_in_url']}?redirect_url={quote(config['app_url'], safe='')}"
     st.markdown(
         "<div style='display:flex;flex-direction:column;align-items:center;"
-        "justify-content:center;height:50vh;gap:0.5rem;text-align:center;'>"
+        "justify-content:center;height:40vh;gap:0.5rem;text-align:center;'>"
         "<h2>🦠 Virus Detection and Classification System</h2>"
         "<p>Please sign in with your ICMR/NIE account to continue.</p>"
         "</div>",
         unsafe_allow_html=True,
     )
-    components.html(
-        f"""
-        <div style="display:flex;justify-content:center;">
-          <a href="{sign_in_url}" target="_top"
-             style="background:#1f6feb;color:#fff;padding:12px 32px;border-radius:8px;
-                    text-decoration:none;font-family:sans-serif;font-weight:600;font-size:16px;">
-            Sign in
-          </a>
-        </div>
-        """,
-        height=70,
-    )
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
+        st.link_button("Sign in", sign_in_url, use_container_width=True, type="primary")
+        st.caption("Opens in a new tab. Once you've signed in there, come back to this tab and click below.")
+        if st.button("I've signed in", use_container_width=True):
+            st.rerun()
 
 
 def require_login():
@@ -184,7 +193,7 @@ def require_login():
         )
         st.stop()
 
-    if result != '__no_session__':
+    if result not in ('__no_session__', '__load_error__'):
         claims = _verify_session_token(result, config)
         if claims:
             st.session_state['clerk_authenticated'] = True
