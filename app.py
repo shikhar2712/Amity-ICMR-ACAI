@@ -70,6 +70,9 @@ from data_handler import (
 # Dashboard pages (KPI summary + record management)
 from dashboard import render_dashboard_page, render_view_records_page
 
+# Clerk sign-in gate
+from auth import require_login, render_sign_out_control
+
 
 # Page configuration - with error handling for deployment consistency
 try:
@@ -118,6 +121,8 @@ def widget_key(name: str) -> str:
     return f"{name}_{st.session_state.get('prediction_reset_version', 0)}"
 
 def main():
+    require_login()
+
     # --- Floating Home icon: lives in document.body, immune to sidebar anim -
     # Streamlit applies a CSS transform to the sidebar/content area while it
     # slides open/closed. Any element with position:fixed nested inside a
@@ -310,6 +315,8 @@ def main():
             st.session_state['navigation_page'] = page_key
             st.session_state['_scroll_to_page'] = True
             st.rerun()
+
+    render_sign_out_control()
 
     page = st.session_state['navigation_page']
 
