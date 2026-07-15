@@ -442,8 +442,14 @@ def main():
 
         reset_version = st.session_state.get('prediction_reset_version', 0)
 
-        # Sidebar for patient demographics
-        st.sidebar.header("Patient Information")
+        # --- Patient Information (single consolidated form, main area) ------
+        # Moved out of the sidebar into the main content area per request.
+        # Kept as live widgets (not a wrapping st.form) so that the
+        # Duration/Month auto-fill, the Department->Other specify box, and the
+        # State->District cascade stay reactive as the user types/selects.
+        # Fields labelled with * are required and are validated when the user
+        # clicks "Predict Virus" at the bottom of the page.
+        st.header("Patient Information")
 
         patient_data = {}
 
@@ -452,75 +458,138 @@ def main():
         # 4) Patient Study ID (auto, hospital-based), 5) Department,
         # 6) Date of Admission, 7) Patient Name, 8) Address, 9) Mobile No.
         # Dates formatted as DD-MM-YYYY to match the requested format.
-        patient_data['date_of_collection'] = st.sidebar.date_input("Date of Collection", value=datetime.now(), key=widget_key('date_of_collection')).strftime('%d-%m-%Y')
-        patient_data['patient_name'] = st.sidebar.text_input("Patient Name", value="", key=widget_key('patient_name'), placeholder="e.g., John Doe")
-        patient_data['patient_mrd_id'] = st.sidebar.text_input("Patient MRD ID (e.g., A123456)", value="", key=widget_key('patient_mrd_id'))
-        # Only two study-site options as requested. "Select..." is the default so the
-        # user must actively choose (validated before prediction).
-        patient_data['hospital'] = st.sidebar.selectbox("Hospital", options=["Select...", "MMC", "TMC"], index=0, key=widget_key('hospital'))
-        patient_data['department'] = st.sidebar.selectbox("Department", options=["Select...", "Medicine", "Pediatrics", "Other"], index=0, key=widget_key('department'))
-        if patient_data['department'] == "Other":
-            patient_data['department_other_specification'] = st.sidebar.text_input(
-                "Specify Department", value="", key=widget_key('department_other'),
-                placeholder="Type the department name"
-            ).strip()
-        else:
-            patient_data['department_other_specification'] = ""
-        admission_date = st.sidebar.date_input("Date of Admission", value=datetime.now(), key=widget_key('date_of_admission'))
-        patient_data['date_of_admission'] = admission_date.strftime('%d-%m-%Y')
-        # Patient ID is auto-assigned (P001, P002, ...) by the database on enrolment.
-        st.sidebar.text_input("Patient ID No.", value="Auto-assigned on enrolment", disabled=True, key=widget_key('patient_id_no'))
 
-        # Address & Location expander - reveals State, District, Subdistrict, Pin Code and Address line
-        with st.sidebar.expander("Address & Location (expand)", expanded=False):
-            patient_data['address_line'] = st.text_input("Address (Street / City)", value="", key=widget_key('address_line'))
+        # Row 1 — collection date, patient name, MRD ID
+        pi_r1c1, pi_r1c2, pi_r1c3 = st.columns(3)
+        with pi_r1c1:
+            patient_data['date_of_collection'] = st.date_input(
+                "Date of Collection", value=datetime.now(),
+                key=widget_key('date_of_collection')).strftime('%d-%m-%Y')
+        with pi_r1c2:
+            patient_data['patient_name'] = st.text_input(
+                "Patient Name", value="", key=widget_key('patient_name'),
+                placeholder="e.g., John Doe")
+        with pi_r1c3:
+            patient_data['patient_mrd_id'] = st.text_input(
+                "Patient MRD ID (e.g., A123456)", value="",
+                key=widget_key('patient_mrd_id'))
 
-            # State selection with names
-            state_names = state_map['state_name'].tolist()
-            # Set Tamil Nadu as default if available, otherwise use first state
-            default_state_index = 0
-            if 'Tamil Nadu' in state_names:
-                default_state_index = state_names.index('Tamil Nadu')
-            selected_state_name = st.selectbox("State", options=state_names, index=default_state_index, key=widget_key('state_select'))
-            patient_data['labstate'] = int(state_map[state_map['state_name'] == selected_state_name]['encoded_value'].values[0])
-
-            # District selection filtered by state
-            filtered_districts = district_state_map[district_state_map['state'] == selected_state_name]
-            district_names = filtered_districts['district_name'].tolist()
-
-            if len(district_names) > 0:
-                selected_district_name = st.selectbox("District", options=district_names, index=0, key=widget_key('district_select'))
-                patient_data['districtencoded'] = int(filtered_districts[filtered_districts['district_name'] == selected_district_name]['district_encoded'].values[0])
+        # Row 2 — hospital*, department*, and the "Other" specify box.
+        # "Select..." is the default so the user must actively choose the two
+        # required study-site fields (validated before prediction).
+        pi_r2c1, pi_r2c2, pi_r2c3 = st.columns(3)
+        with pi_r2c1:
+            patient_data['hospital'] = st.selectbox(
+                "Hospital *", options=["Select...", "MMC", "TMC"], index=0,
+                key=widget_key('hospital'))
+        with pi_r2c2:
+            patient_data['department'] = st.selectbox(
+                "Department *",
+                options=["Select...", "Medicine", "Pediatrics", "Other"],
+                index=0, key=widget_key('department'))
+        with pi_r2c3:
+            if patient_data['department'] == "Other":
+                patient_data['department_other_specification'] = st.text_input(
+                    "Specify Department", value="",
+                    key=widget_key('department_other'),
+                    placeholder="Type the department name").strip()
             else:
-                st.warning("No districts available for selected state")
-                patient_data['districtencoded'] = 0
-                selected_district_name = ''
+                patient_data['department_other_specification'] = ""
+
+        # Row 3 — admission date, auto-assigned patient ID, mobile number
+        pi_r3c1, pi_r3c2, pi_r3c3 = st.columns(3)
+        with pi_r3c1:
+            admission_date = st.date_input(
+                "Date of Admission", value=datetime.now(),
+                key=widget_key('date_of_admission'))
+            patient_data['date_of_admission'] = admission_date.strftime('%d-%m-%Y')
+        with pi_r3c2:
+            # Patient ID is auto-assigned (P001, P002, ...) by the database on enrolment.
+            st.text_input("Patient ID No.", value="Auto-assigned on enrolment",
+                          disabled=True, key=widget_key('patient_id_no'))
+        with pi_r3c3:
+            patient_data['mobile_no'] = st.text_input(
+                "Mobile No (10 digit)", value="", key=widget_key('mobile_no'))
+
+        # Address & Location expander — State, District, Subdistrict, Pin, Address line
+        with st.expander("Address & Location (expand)", expanded=False):
+            patient_data['address_line'] = st.text_input(
+                "Address (Street / City)", value="", key=widget_key('address_line'))
+
+            addr_c1, addr_c2 = st.columns(2)
+            with addr_c1:
+                # State selection with names
+                state_names = state_map['state_name'].tolist()
+                # Set Tamil Nadu as default if available, otherwise use first state
+                default_state_index = 0
+                if 'Tamil Nadu' in state_names:
+                    default_state_index = state_names.index('Tamil Nadu')
+                selected_state_name = st.selectbox(
+                    "State", options=state_names, index=default_state_index,
+                    key=widget_key('state_select'))
+                patient_data['labstate'] = int(state_map[state_map['state_name'] == selected_state_name]['encoded_value'].values[0])
+            with addr_c2:
+                # District selection filtered by state
+                filtered_districts = district_state_map[district_state_map['state'] == selected_state_name]
+                district_names = filtered_districts['district_name'].tolist()
+
+                if len(district_names) > 0:
+                    selected_district_name = st.selectbox(
+                        "District", options=district_names, index=0,
+                        key=widget_key('district_select'))
+                    patient_data['districtencoded'] = int(filtered_districts[filtered_districts['district_name'] == selected_district_name]['district_encoded'].values[0])
+                else:
+                    st.warning("No districts available for selected state")
+                    patient_data['districtencoded'] = 0
+                    selected_district_name = ''
 
             # Address details
-            patient_data['subdistrict'] = st.text_input("Subdistrict", value="", key=widget_key('subdistrict'))
-            patient_data['pin_code'] = st.text_input("Pin Code", value="", key=widget_key('pin_code'))
+            addr_c3, addr_c4 = st.columns(2)
+            with addr_c3:
+                patient_data['subdistrict'] = st.text_input(
+                    "Subdistrict", value="", key=widget_key('subdistrict'))
+            with addr_c4:
+                patient_data['pin_code'] = st.text_input(
+                    "Pin Code", value="", key=widget_key('pin_code'))
 
-        patient_data['mobile_no'] = st.sidebar.text_input("Mobile No (10 digit)", value="", key=widget_key('mobile_no'))
+        st.markdown("---")
 
-        st.sidebar.markdown("---")
+        # Row 4 — age, sex*, patient type*
+        pi_r4c1, pi_r4c2, pi_r4c3 = st.columns(3)
+        with pi_r4c1:
+            patient_data['age'] = st.number_input(
+                "Age (if age is less than 1, enter 0)", min_value=0,
+                max_value=120, value=0, step=1, key=widget_key('age'))
+        with pi_r4c2:
+            patient_data['SEX'] = st.selectbox(
+                "Sex *", options=[None, 0, 1, 2],
+                format_func=lambda x: "Select..." if x is None else SEX_LABELS[x],
+                index=0, key=widget_key('sex'))
+        with pi_r4c3:
+            patient_data['PATIENTTYPE'] = st.selectbox(
+                "Patient Type *", options=[None, 0, 1],
+                format_func=lambda x: "Select..." if x is None else ("Outpatient" if x == 0 else "Inpatient"),
+                index=0, key=widget_key('patient_type'))
 
-        # Remaining fields shown below the top requested order
-        patient_data['age'] = st.sidebar.number_input("Age (if age is less than 1, enter 0)", min_value=0, max_value=120, value=0, step=1, key=widget_key('age'))
-        patient_data['SEX'] = st.sidebar.selectbox("Sex", options=[None, 0, 1, 2],
-                                format_func=lambda x: "Select..." if x is None else SEX_LABELS[x], index=0, key=widget_key('sex'))
-        patient_data['PATIENTTYPE'] = st.sidebar.selectbox("Patient Type", options=[None, 0, 1],
-                                    format_func=lambda x: "Select..." if x is None else ("Outpatient" if x == 0 else "Inpatient"), index=0, key=widget_key('patient_type'))
-        onset_date = st.sidebar.date_input("Onset of Illness", value=datetime.now(), key=widget_key('onset_of_illness'))
-        patient_data['onset_of_illness'] = onset_date.strftime('%d-%m-%Y')
+        # Row 5 — onset date + auto-derived duration / month captions
+        pi_r5c1, pi_r5c2 = st.columns([1, 2])
+        with pi_r5c1:
+            onset_date = st.date_input(
+                "Onset of Illness", value=datetime.now(),
+                key=widget_key('onset_of_illness'))
+            patient_data['onset_of_illness'] = onset_date.strftime('%d-%m-%Y')
         duration_of_illness = max(0, (admission_date - onset_date).days)
         patient_data['durationofillness'] = duration_of_illness
-        st.sidebar.caption(f"Duration of Illness (days): {duration_of_illness}")
-
-        # Temporal features — Month of Illness is derived automatically from the Onset date
+        with pi_r5c2:
+            st.caption(f"Duration of Illness (days): {duration_of_illness}")
+            # Temporal features — Month of Illness is derived automatically from the Onset date
+            st.caption(f"Month of Illness: {onset_date.strftime('%B')} (auto-filled from Onset date)")
         patient_data['month'] = onset_date.month
-        st.sidebar.caption(f"Month of Illness: {onset_date.strftime('%B')} (auto-filled from Onset date)")
         # Year is fixed to 2015 for model input (hidden from UI)
         patient_data['year'] = 2015
+
+        st.caption("Fields marked with * are required.")
+        st.markdown("---")
 
         # Syndrome Selection
         st.header("Syndrome Classification")
