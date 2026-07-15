@@ -354,13 +354,13 @@ def main():
 
     if page == "Home":
         st.markdown(
-            "<h1 style='text-align: center;'>🦠 Virus Detection and Classification System</h1>",
+            "<h1 style='text-align: center;'>🦠 Personalized Laboratory Test Recommendation System</h1>",
             unsafe_allow_html=True)
         st.markdown(
             "<h2 style='text-align: center;'>Advanced AI-Powered Diagnostic Tool for Viral Infections</h2>",
             unsafe_allow_html=True)
         st.write("""
-        Welcome to the Virus Detection and Classification System!
+        Welcome to the Personalized Laboratory Test Recommendation System!
         
         This advanced AI-driven system assists healthcare professionals by analyzing patient symptoms 
         and demographic information to predict the most probable viral infection from a comprehensive 
@@ -414,7 +414,7 @@ def main():
         st.warning("**Medical Disclaimer**: This system provides diagnostic assistance and should not replace professional medical evaluation and treatment decisions.")
 
     elif page == "Prediction":
-        st.title("🦠 Virus Detection and Classification System")
+        st.title("🦠 Personalized Laboratory Test Recommendation System")
         st.markdown("---")
         st.write("Enter patient information and clinical symptoms to predict the most likely virus.")
         st.button("➕ New Case (clear the form for a new patient)",
