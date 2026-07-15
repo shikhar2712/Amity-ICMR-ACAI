@@ -44,6 +44,18 @@ to hide the button):
     client_secret = "<Google OAuth client secret>"
     server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
 
+SMTP (required for the "Forgot password?" email-code flow; omit the block to
+disable that flow -- sign-in itself still works without it). For Gmail create
+an App Password (Google Account -> Security -> 2-Step Verification -> App
+passwords) and use it as `password`:
+
+    [smtp]
+    host = "smtp.gmail.com"
+    port = 587
+    username = "yourproject@gmail.com"
+    password = "<16-char Gmail app password>"
+    from_email = "yourproject@gmail.com"   # optional, defaults to username
+
 Security notes
 --------------
 - The secret key is read only from secrets/env, never hardcoded.
@@ -58,9 +70,14 @@ Security notes
   trade-off is that a full browser reload starts a fresh session and asks
   for sign-in again.
 """
+import hashlib
+import hmac
 import os
 import re
+import secrets as pysecrets
+import smtplib
 import time
+from email.message import EmailMessage
 
 import streamlit as st
 
@@ -79,7 +96,8 @@ VALID_ROLES = set(ROLE_PAGES)
 # session state wholesale and must preserve these, so they're exported.
 AUTH_SESSION_KEY = "auth_session"
 AUTH_THROTTLE_KEY = "auth_throttle"
-AUTH_STATE_KEYS = (AUTH_SESSION_KEY, AUTH_THROTTLE_KEY)
+AUTH_RESET_KEY = "auth_pw_reset"
+AUTH_STATE_KEYS = (AUTH_SESSION_KEY, AUTH_THROTTLE_KEY, AUTH_RESET_KEY)
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _MIN_PASSWORD_LEN = 8
@@ -88,6 +106,13 @@ _MIN_PASSWORD_LEN = 8
 # attempts for the lockout window. Per Streamlit session.
 _MAX_FAILURES = 5
 _LOCKOUT_SECONDS = 60
+
+# Forgot-password email codes: 6 digits, valid 10 minutes, at most 5 wrong
+# guesses per code, and a cooldown between sends. Per Streamlit session.
+_OTP_DIGITS = 6
+_OTP_TTL_SECONDS = 600
+_OTP_MAX_ATTEMPTS = 5
+_OTP_RESEND_COOLDOWN = 60
 
 
 # ---------------------------------------------------------------------------
@@ -237,6 +262,189 @@ def _record_failure():
 
 
 # ---------------------------------------------------------------------------
+# Email (SMTP) for the forgot-password flow
+# ---------------------------------------------------------------------------
+
+def _smtp_config():
+    """SMTP settings from secrets, or None when the block is absent."""
+    try:
+        smtp = st.secrets.get("smtp", None)
+        if smtp and smtp.get("host") and smtp.get("username") and smtp.get("password"):
+            return smtp
+    except Exception:
+        pass
+    return None
+
+
+def _send_email(to_addr: str, subject: str, body: str) -> bool:
+    smtp = _smtp_config()
+    if not smtp:
+        return False
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = smtp.get("from_email") or smtp["username"]
+    msg["To"] = to_addr
+    msg.set_content(body)
+    try:
+        with smtplib.SMTP(smtp["host"], int(smtp.get("port", 587)), timeout=15) as srv:
+            srv.starttls()
+            srv.login(smtp["username"], smtp["password"])
+            srv.send_message(msg)
+        return True
+    except Exception:
+        return False
+
+
+# ---------------------------------------------------------------------------
+# Forgot-password (email one-time code)
+# ---------------------------------------------------------------------------
+
+def _hash_code(code: str) -> str:
+    return hashlib.sha256(code.encode()).hexdigest()
+
+
+def _reset_state():
+    return st.session_state.get(AUTH_RESET_KEY)
+
+
+def _start_password_reset(email: str):
+    """Email a one-time code. Returns (ok, message) -- the message is the
+    same whether or not an account exists, so the form can't be used to
+    probe which emails are registered."""
+    generic = ("If an account exists for that email, a 6-digit code has been "
+               "sent to it. The code is valid for 10 minutes.")
+    state = _reset_state()
+    if state and time.time() - state.get("last_sent", 0) < _OTP_RESEND_COOLDOWN:
+        wait = int(_OTP_RESEND_COOLDOWN - (time.time() - state["last_sent"]))
+        return False, f"A code was sent recently. Please wait {wait}s before requesting another."
+
+    clerk = _get_clerk()
+    user = None
+    if clerk is not None:
+        try:
+            user = _find_clerk_user(clerk, email)
+        except Exception:
+            user = None
+
+    # Generate/store state only when the account is real, but always claim a
+    # send: the visitor sees identical output either way.
+    if user is not None:
+        code = "".join(str(pysecrets.randbelow(10)) for _ in range(_OTP_DIGITS))
+        sent = _send_email(
+            email,
+            "Your password reset code - Virus Detection System",
+            f"Your password reset code is: {code}\n\n"
+            f"It is valid for 10 minutes. If you did not request this, you can "
+            f"safely ignore this email -- your password has not been changed.",
+        )
+        if not sent:
+            return False, ("Could not send the reset email. Please try again "
+                           "later or contact your administrator.")
+        st.session_state[AUTH_RESET_KEY] = {
+            "email": email,
+            "user_id": user.id,
+            "code_hash": _hash_code(code),
+            "expires_at": time.time() + _OTP_TTL_SECONDS,
+            "attempts": 0,
+            "last_sent": time.time(),
+        }
+    return True, generic
+
+
+def _complete_password_reset(email: str, code: str, new_password: str):
+    """Verify the emailed code and set the new password. Returns (ok, error)."""
+    state = _reset_state()
+    generic = "Invalid or expired code. Please request a new one."
+    if (not state or state.get("email") != email
+            or time.time() > state.get("expires_at", 0)):
+        return False, generic
+    if state["attempts"] >= _OTP_MAX_ATTEMPTS:
+        st.session_state.pop(AUTH_RESET_KEY, None)
+        return False, "Too many incorrect codes. Please request a new one."
+    if not hmac.compare_digest(_hash_code(code.strip()), state["code_hash"]):
+        state["attempts"] += 1
+        return False, "Incorrect code. Please check the email and try again."
+
+    clerk = _get_clerk()
+    try:
+        user = clerk.users.update(
+            user_id=state["user_id"],
+            password=new_password,
+            sign_out_of_other_sessions=True,
+            timeout_ms=15000,
+        )
+    except Exception:
+        # Most likely Clerk rejected the password (too weak / breached).
+        return False, ("This password can't be used (it may be too weak or "
+                       "found in a known data breach). Please choose a "
+                       "longer, unique password.")
+
+    st.session_state.pop(AUTH_RESET_KEY, None)  # single use
+    name = " ".join(p for p in (user.first_name, user.last_name) if p) or email
+    _set_session(email, name, _role_from_user(user), "clerk")
+    return True, None
+
+
+# ---------------------------------------------------------------------------
+# Change / set password for signed-in users
+# ---------------------------------------------------------------------------
+
+def _change_password(current_password: str, new_password: str):
+    """Change the signed-in user's password. Identity proof: their current
+    password -- except for Google-authenticated users without one, whose
+    identity was already proven by the Google login. Returns (ok, error)."""
+    sess = _session() or {}
+    email = sess.get("email")
+    clerk = _get_clerk()
+    if not email or clerk is None:
+        return False, "Password management is not available right now."
+
+    wait = _throttle_seconds_left()
+    if wait:
+        return False, f"Too many failed attempts. Please wait {wait} seconds and try again."
+
+    try:
+        user = _find_clerk_user(clerk, email)
+    except Exception:
+        return False, "Temporarily unavailable. Please try again shortly."
+
+    if user is not None and getattr(user, "password_enabled", False):
+        try:
+            clerk.users.verify_password(
+                user_id=user.id, password=current_password, timeout_ms=10000)
+        except Exception:
+            _record_failure()
+            return False, "Current password is incorrect."
+    elif sess.get("login_method") != "google":
+        return False, "Password management is not available for this account."
+
+    weak = ("This password can't be used (it may be too weak or found in a "
+            "known data breach). Please choose a longer, unique password.")
+    try:
+        if user is None:
+            # Google-authenticated visitor with no Clerk record yet: create
+            # one so they can also sign in with email/password. Standard
+            # access -- roles are only ever granted in the Clerk dashboard.
+            clerk.users.create(
+                email_address=[email],
+                password=new_password,
+                first_name=(sess.get("name") or "").split(" ")[0] or None,
+                public_metadata={"role": "user"},
+                timeout_ms=15000,
+            )
+        else:
+            clerk.users.update(
+                user_id=user.id,
+                password=new_password,
+                sign_out_of_other_sessions=True,
+                timeout_ms=15000,
+            )
+    except Exception:
+        return False, weak
+    return True, None
+
+
+# ---------------------------------------------------------------------------
 # Auth flows
 # ---------------------------------------------------------------------------
 
@@ -362,6 +570,71 @@ _AUTH_CSS = """
 """
 
 
+def _render_forgot_password():
+    """Two-step 'Forgot password?' flow inside the sign-in tab: request an
+    emailed code, then enter it with a new password."""
+    with st.expander("Forgot password?"):
+        if not _smtp_config():
+            st.info("Password reset by email is not configured on this "
+                    "deployment. Please contact your administrator to reset "
+                    "your password.")
+            return
+
+        awaiting_code = _reset_state() is not None
+
+        with st.form("pw_reset_request_form", border=False):
+            reset_email = st.text_input(
+                "Account email", key="reset_email",
+                placeholder="you@example.com", autocomplete="email",
+            )
+            sent = st.form_submit_button(
+                "Resend code" if awaiting_code else "Email me a code")
+        if sent:
+            email = reset_email.strip().lower()
+            if not _EMAIL_RE.match(email):
+                st.error("Please enter a valid email address.")
+            else:
+                with st.spinner("Sending code…"):
+                    ok, msg = _start_password_reset(email)
+                (st.success if ok else st.error)(msg)
+                if ok:
+                    st.rerun()
+
+        if awaiting_code:
+            st.caption("Enter the 6-digit code from the email, then choose "
+                       "a new password.")
+            with st.form("pw_reset_complete_form", border=False):
+                code = st.text_input("6-digit code", key="reset_code",
+                                     max_chars=_OTP_DIGITS, placeholder="123456")
+                new_pw = st.text_input(
+                    "New password", key="reset_new_pw", type="password",
+                    placeholder=f"At least {_MIN_PASSWORD_LEN} characters, with a letter and a number",
+                    autocomplete="new-password",
+                )
+                confirm_pw = st.text_input(
+                    "Confirm new password", key="reset_confirm_pw",
+                    type="password", autocomplete="new-password",
+                )
+                submitted = st.form_submit_button("Reset password", type="primary")
+            if submitted:
+                email = (st.session_state.get("reset_email") or "").strip().lower()
+                err = None
+                if len(new_pw) < _MIN_PASSWORD_LEN:
+                    err = f"Password must be at least {_MIN_PASSWORD_LEN} characters long."
+                elif not (re.search(r"[A-Za-z]", new_pw) and re.search(r"\d", new_pw)):
+                    err = "Password must contain at least one letter and one number."
+                elif new_pw != confirm_pw:
+                    err = "Passwords do not match."
+                if err is None:
+                    with st.spinner("Resetting your password…"):
+                        ok, err = _complete_password_reset(email, code, new_pw)
+                    if ok:
+                        st.toast("Password reset. You're signed in!", icon="✅")
+                        st.rerun()
+                if err:
+                    st.error(err)
+
+
 def _render_login_screen():
     st.markdown(_AUTH_CSS, unsafe_allow_html=True)
 
@@ -418,6 +691,7 @@ def _render_login_screen():
                             st.rerun()
                         else:
                             st.error(err)
+                _render_forgot_password()
             else:
                 st.info("Email/password sign-in is not configured on this deployment.")
 
@@ -512,6 +786,57 @@ def require_login():
     _render_login_screen()
 
 
+def _render_change_password(sess):
+    """Sidebar 'Change password' expander. Requires the current password;
+    Google-authenticated users without one can set a first password instead
+    (their identity is already proven by the Google login)."""
+    if _get_clerk() is None:
+        return
+    has_password = sess.get("login_method") == "clerk"
+    label = "🔑 Change password" if has_password else "🔑 Set a password"
+    with st.sidebar.expander(label):
+        with st.form("change_pw_form", border=False):
+            current = ""
+            if has_password:
+                current = st.text_input(
+                    "Current password", type="password",
+                    key="chpw_current", autocomplete="current-password",
+                )
+            else:
+                st.caption("Add a password so you can also sign in without "
+                           "Google.")
+            new_pw = st.text_input(
+                "New password", type="password", key="chpw_new",
+                placeholder=f"At least {_MIN_PASSWORD_LEN} characters, with a letter and a number",
+                autocomplete="new-password",
+            )
+            confirm_pw = st.text_input(
+                "Confirm new password", type="password", key="chpw_confirm",
+                autocomplete="new-password",
+            )
+            submitted = st.form_submit_button("Update password", type="primary")
+        if submitted:
+            err = None
+            if has_password and not current:
+                err = "Please enter your current password."
+            elif len(new_pw) < _MIN_PASSWORD_LEN:
+                err = f"Password must be at least {_MIN_PASSWORD_LEN} characters long."
+            elif not (re.search(r"[A-Za-z]", new_pw) and re.search(r"\d", new_pw)):
+                err = "Password must contain at least one letter and one number."
+            elif new_pw != confirm_pw:
+                err = "Passwords do not match."
+            elif has_password and current == new_pw:
+                err = "The new password must be different from the current one."
+            if err is None:
+                with st.spinner("Updating password…"):
+                    ok, err = _change_password(current, new_pw)
+                if ok:
+                    st.toast("Password updated.", icon="🔑")
+                    st.success("Password updated.")
+            if err:
+                st.error(err)
+
+
 def render_sign_out_control():
     """Sidebar identity + role badge + sign-out. Call after require_login()."""
     sess = _session() or {}
@@ -532,6 +857,8 @@ def render_sign_out_control():
         f"</div>",
         unsafe_allow_html=True,
     )
+    _render_change_password(sess)
+
     if st.sidebar.button("Sign out", use_container_width=True, key="auth_sign_out_btn"):
         was_google = sess.get("login_method") == "google"
         for key in AUTH_STATE_KEYS:
