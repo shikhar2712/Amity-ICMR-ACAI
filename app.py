@@ -70,8 +70,11 @@ from data_handler import (
 # Dashboard pages (KPI summary + record management)
 from dashboard import render_dashboard_page, render_view_records_page
 
-# Clerk sign-in gate
-from auth import require_login, render_sign_out_control
+# Auth gate (Clerk email/password + Google) and role-based access control
+from auth import (
+    require_login, render_sign_out_control,
+    allowed_pages, require_page_access, DEFAULT_PAGE, AUTH_STATE_KEYS,
+)
 
 
 # Page configuration - with error handling for deployment consistency
@@ -106,7 +109,12 @@ def reset_prediction_workflow():
     """Clear workflow state so all inputs can be entered again from scratch."""
     preserved_page = st.session_state.get('navigation_page', 'Prediction')
     current_reset_version = st.session_state.get('prediction_reset_version', 0)
+    # The auth session lives in st.session_state too -- clearing it here would
+    # sign the user out on every "New Case" click, so carry it across.
+    preserved_auth = {k: st.session_state[k] for k in AUTH_STATE_KEYS
+                      if k in st.session_state}
     st.session_state.clear()
+    st.session_state.update(preserved_auth)
     st.session_state['navigation_page'] = preserved_page
     st.session_state['prediction_reset_version'] = current_reset_version + 1
 
@@ -303,8 +311,15 @@ def main():
         ("View Records", "View Records"),
         ("About", "About"),
     ]
+    # Role-based access: only render nav buttons the signed-in role may open,
+    # and clamp any stale/forged page selection back to the default page.
+    # (Each restricted page handler *also* re-checks access below.)
+    permitted_pages = allowed_pages()
+    NAV_ITEMS = [(label, key) for label, key in NAV_ITEMS if key in permitted_pages]
     if 'navigation_page' not in st.session_state:
-        st.session_state['navigation_page'] = 'Home'
+        st.session_state['navigation_page'] = DEFAULT_PAGE
+    if st.session_state['navigation_page'] not in permitted_pages:
+        st.session_state['navigation_page'] = DEFAULT_PAGE
 
     for label, page_key in NAV_ITEMS:
         is_active = st.session_state['navigation_page'] == page_key
@@ -363,9 +378,11 @@ def main():
         st.warning("**Medical Disclaimer**: This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or advice. Always consult qualified medical personnel for patient care decisions.")
 
     elif page == "Dashboard":
+        require_page_access("Dashboard")
         render_dashboard_page()
 
     elif page == "View Records":
+        require_page_access("View Records")
         render_view_records_page()
 
     elif page == "About":
