@@ -77,7 +77,7 @@ from auth import require_login, render_sign_out_control
 # Page configuration - with error handling for deployment consistency
 try:
     st.set_page_config(
-        page_title="Virus Detection System",
+        page_title="Personalized Laboratory Test Recommendation System",
         page_icon="🦠",
         layout="wide",
         initial_sidebar_state="expanded"
