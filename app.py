@@ -1,3 +1,6 @@
+import base64
+from io import BytesIO
+
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
@@ -127,6 +130,52 @@ def request_reset_prediction_workflow():
 def widget_key(name: str) -> str:
     """Create a versioned widget key so reset actions rebuild widget state."""
     return f"{name}_{st.session_state.get('prediction_reset_version', 0)}"
+
+
+@st.cache_data(show_spinner=False)
+def _logo_row_html():
+    """One markup block holding the three institutional logos in a 3-equal-column
+    grid. The centre logo is `justify-self:center`, so it sits exactly on the
+    page's centre line (aligned with the centred title below) regardless of the
+    side logos' widths; the side logos hug the outer edges. Images are
+    downscaled and inlined (base64) so the row is a single, precisely-aligned
+    element rather than three independently-aligned Streamlit columns (the old
+    layout left the centre logo left-aligned inside a wide column, so it looked
+    off-centre). Returns None if the image files can't be read."""
+    from PIL import Image
+
+    def _enc(path, display_w):
+        im = Image.open(path)
+        if im.mode not in ("RGB", "RGBA"):
+            im = im.convert("RGB")
+        target = display_w * 2  # 2x source for crisp HiDPI rendering
+        if im.width > target:
+            im = im.resize((target, round(im.height * target / im.width)))
+        is_png = path.lower().endswith(".png")
+        buf = BytesIO()
+        im.save(buf, format="PNG" if is_png else "JPEG", quality=88, optimize=True)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        return f"data:image/{'png' if is_png else 'jpeg'};base64,{b64}"
+
+    try:
+        left = _enc("logo_1.jpeg", 300)
+        center = _enc("logo_2.jpeg", 250)
+        right = _enc("Amity_logo2.png", 250)
+    except Exception:
+        return None
+
+    return (
+        "<div style='display:grid;grid-template-columns:1fr 1fr 1fr;"
+        "align-items:center;column-gap:1.5rem;padding:0.75rem 1.5rem 0.25rem;'>"
+        f"<img src='{left}' alt='ICMR-NIE' "
+        "style='justify-self:start;width:300px;max-width:100%;height:auto;'>"
+        f"<img src='{center}' alt='Department of Health Research' "
+        "style='justify-self:center;width:250px;max-width:100%;height:auto;'>"
+        f"<img src='{right}' alt='Amity Centre for Artificial Intelligence' "
+        "style='justify-self:end;width:250px;max-width:100%;height:auto;'>"
+        "</div>"
+    )
+
 
 def main():
     require_login()
@@ -259,23 +308,29 @@ def main():
         height=0,
     )
 
-    # Top logos
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col1:
-        try:
-            st.image("logo_1.jpeg", width=300)
-        except:
-            st.write("")  # Skip if image not found
-    with col3:
-        try:
-            st.image("Amity_logo2.png", width=250)
-        except:
-            st.write("")  # Skip if image not found
-    with col2:
-        try:
-            st.image("logo_2.jpeg", width=250)
-        except:
-            st.write("")  # Skip if image not found
+    # Top logos — centred middle logo on the page's centre line (see
+    # _logo_row_html). Falls back to the original column layout if the image
+    # files can't be read.
+    _logo_html = _logo_row_html()
+    if _logo_html:
+        st.markdown(_logo_html, unsafe_allow_html=True)
+    else:
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col1:
+            try:
+                st.image("logo_1.jpeg", width=300)
+            except Exception:
+                st.write("")  # Skip if image not found
+        with col3:
+            try:
+                st.image("Amity_logo2.png", width=250)
+            except Exception:
+                st.write("")  # Skip if image not found
+        with col2:
+            try:
+                st.image("logo_2.jpeg", width=250)
+            except Exception:
+                st.write("")  # Skip if image not found
 
     # --- Sidebar navigation: clickable buttons, no radio circles -----------
     # Adjustable positioning for the nav title + buttons. Edit the values
