@@ -354,124 +354,125 @@ def main():
 
     if page == "Home":
 
-    # --------------------------------------------------
-    # Home Page Brand Colors
-    # --------------------------------------------------
-    PRIMARY_COLOR = "#1565C0"      # Medical Blue
-    SECONDARY_COLOR = "#26A69A"    # Teal
-    ACCENT_COLOR = "#43A047"       # Success Green
-    ALERT_COLOR = "#EF5350"        # Alert Red
-
-    st.markdown(
-        f"""
-        <style>
-
-        .home-body {{
-            color: #424242;
-            font-size:16px;
-            line-height:1.8;
-        }}
-
-        .home-body b {{
-            color:{PRIMARY_COLOR};
-        }}
-
-        .home-body li::marker {{
-            color:{ACCENT_COLOR};
-        }}
-
-        .home-body ul {{
-            padding-left:25px;
-        }}
-
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <h1 style="
-            text-align:center;
-            color:{PRIMARY_COLOR};
-            font-weight:700;
-        ">
-        🦠 Personalized Laboratory Test Recommendation System
-        </h1>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <h2 style="
-            text-align:center;
-            color:{SECONDARY_COLOR};
-            font-weight:600;
-            margin-top:-8px;
-        ">
-        Advanced AI-Powered Diagnostic Tool for Viral Infections
-        </h2>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div class="home-body">
-
-        Welcome to the Personalized Laboratory Test Recommendation System!
-
-        This advanced AI-driven system assists healthcare professionals by analyzing patient symptoms and demographic information to predict the most probable viral infection from a comprehensive database of 26+ virus categories.
-
-        <br>
-
-        <b>Key Features</b>
-
-        <ul>
-
-        <li><b>Dual-Model Architecture</b>: Primary classification for major virus categories and secondary classification for "Other Viruses".</li>
-
-        <li><b>Comprehensive Symptom Analysis</b>: Covers neurological, gastrointestinal, respiratory, dermatological and systemic symptoms.</li>
-
-        <li><b>Geo-temporal Intelligence</b>: Incorporates seasonal patterns and geographical factors.</li>
-
-        <li><b>Real-time Predictions</b>: Instant probability scores and confidence metrics.</li>
-
-        </ul>
-
-        Navigate to the <b>Prediction/Test Recommendation</b> page using the sidebar to input patient details and obtain comprehensive virus classification results.
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div style="
-            background:#FFF5F5;
-            border-left:6px solid {ALERT_COLOR};
-            color:#333333;
-            padding:16px;
-            border-radius:8px;
-            margin-top:20px;
-        ">
-
-        <b style="color:{ALERT_COLOR};">
-        Medical Disclaimer
-        </b>
-
-        <br><br>
-
-        This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or medical advice.
-
-        Always consult qualified medical personnel for patient care decisions.
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        # --------------------------------------------------
+        # Home Page Brand Colors
+        # --------------------------------------------------
+        PRIMARY_COLOR = "#1565C0"      # Medical Blue
+        SECONDARY_COLOR = "#26A69A"    # Teal
+        ACCENT_COLOR = "#43A047"       # Success Green
+        ALERT_COLOR = "#EF5350"        # Alert Red
+    
+        st.markdown(
+            f"""
+            <style>
+    
+            .home-body {{
+                color: #424242;
+                font-size:16px;
+                line-height:1.8;
+            }}
+    
+            .home-body b {{
+                color:{PRIMARY_COLOR};
+            }}
+    
+            .home-body li::marker {{
+                color:{ACCENT_COLOR};
+            }}
+    
+            .home-body ul {{
+                padding-left:25px;
+            }}
+    
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+    
+        st.markdown(
+            f"""
+            <h1 style="
+                text-align:center;
+                color:{PRIMARY_COLOR};
+                font-weight:700;
+            ">
+            🦠 Personalized Laboratory Test Recommendation System
+            </h1>
+            """,
+            unsafe_allow_html=True,
+        )
+    
+        st.markdown(
+            f"""
+            <h2 style="
+                text-align:center;
+                color:{SECONDARY_COLOR};
+                font-weight:600;
+                margin-top:-8px;
+            ">
+            Advanced AI-Powered Diagnostic Tool for Viral Infections
+            </h2>
+            """,
+            unsafe_allow_html=True,
+        )
+    
+        st.markdown(
+            f"""
+            <div class="home-body">
+    
+            Welcome to the Personalized Laboratory Test Recommendation System!
+    
+            This advanced AI-driven system assists healthcare professionals by analyzing patient symptoms and demographic information to predict the most probable viral infection from a comprehensive database of 26+ virus categories.
+    
+            <br>
+    
+            <b>Key Features</b>
+    
+            <ul>
+    
+            <li><b>Dual-Model Architecture</b>: Primary classification for major virus categories and secondary classification for "Other Viruses".</li>
+    
+            <li><b>Comprehensive Symptom Analysis</b>: Covers neurological, gastrointestinal, respiratory, dermatological and systemic symptoms.</li>
+    
+            <li><b>Geo-temporal Intelligence</b>: Incorporates seasonal patterns and geographical factors.</li>
+    
+            <li><b>Real-time Predictions</b>: Instant probability scores and confidence metrics.</li>
+    
+            </ul>
+    
+            Navigate to the <b>Prediction/Test Recommendation</b> page using the sidebar to input patient details and obtain comprehensive virus classification results.
+    
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    
+        st.markdown(
+            f"""
+            <div style="
+                background:#FFF5F5;
+                border-left:6px solid {ALERT_COLOR};
+                color:#333333;
+                padding:16px;
+                border-radius:8px;
+                margin-top:20px;
+            ">
+    
+            <b style="color:{ALERT_COLOR};">
+            Medical Disclaimer
+            </b>
+    
+            <br><br>
+    
+            This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or medical advice.
+    
+            Always consult qualified medical personnel for patient care decisions.
+    
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    
     elif page == "Dashboard":
         require_page_access("Dashboard")
         render_dashboard_page()
