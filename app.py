@@ -459,11 +459,9 @@ def main():
             ">
     
             <b style="color:{ALERT_COLOR};">
-            Medical Disclaimer
+            Medical Disclaimer:
             </b>
-    
-          
-    
+            
             This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or medical advice.
     
             Always consult qualified medical personnel for patient care decisions.
