@@ -646,7 +646,7 @@ def _render_login_screen():
             pass
     st.markdown(
         "<div class='auth-hero'>"
-        "<h1>🦠 Virus Detection and Classification System</h1>"
+        "<h1>🦠 Personalized Laboratory Test Recommendation System</h1>"
         "<p>Sign in to continue to the diagnostic workspace</p>"
         "</div>",
         unsafe_allow_html=True,
