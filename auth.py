@@ -70,6 +70,7 @@ Security notes
   trade-off is that a full browser reload starts a fresh session and asks
   for sign-in again.
 """
+import base64
 import hashlib
 import hmac
 import os
@@ -78,6 +79,7 @@ import secrets as pysecrets
 import smtplib
 import time
 from email.message import EmailMessage
+from io import BytesIO
 
 import streamlit as st
 
@@ -635,15 +637,59 @@ def _render_forgot_password():
                     st.error(err)
 
 
+@st.cache_data(show_spinner=False)
+def _auth_logos_html():
+    """Co-branded logo strip for the top of the auth card: the ICMR/NIE logo
+    and the Amity logo side by side, horizontally centred and balanced to a
+    common height, with a subtle divider between them. Images are downscaled
+    and inlined (base64). Returns '' if the files can't be read (the header
+    then simply omits the logos)."""
+    from PIL import Image
+
+    def _enc(path, display_h):
+        im = Image.open(path)
+        if im.mode not in ("RGB", "RGBA"):
+            im = im.convert("RGB")
+        target_h = display_h * 2  # 2x for crisp HiDPI rendering
+        if im.height > target_h:
+            im = im.resize((round(im.width * target_h / im.height), target_h))
+        is_png = path.lower().endswith(".png")
+        buf = BytesIO()
+        im.save(buf, format="PNG" if is_png else "JPEG", quality=88, optimize=True)
+        return (f"data:image/{'png' if is_png else 'jpeg'};base64,"
+                + base64.b64encode(buf.getvalue()).decode())
+
+    try:
+        icmr = _enc("logo_1.jpeg", 54)
+        amity = _enc("Amity_logo2.png", 54)
+    except Exception:
+        return ""
+
+    return (
+        "<div style='display:flex;align-items:center;justify-content:center;"
+        "gap:1.75rem;flex-wrap:wrap;margin:0.6rem 0 0.4rem;'>"
+        f"<img src='{icmr}' alt='ICMR-NIE' style='height:54px;width:auto;'>"
+        "<span style='width:1px;height:42px;background:rgba(49,51,63,0.18);'></span>"
+        f"<img src='{amity}' alt='Amity Centre for Artificial Intelligence' "
+        "style='height:54px;width:auto;'>"
+        "</div>"
+    )
+
+
 def _render_login_screen():
     st.markdown(_AUTH_CSS, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([2, 3, 2])
-    with col2:
-        try:
-            st.image("Amity_logo2.png", use_container_width=True)
-        except Exception:
-            pass
+    # Co-branded ICMR/NIE + Amity logos, centred at the top of the sign-in card.
+    _logos_html = _auth_logos_html()
+    if _logos_html:
+        st.markdown(_logos_html, unsafe_allow_html=True)
+    else:
+        col1, col2, col3 = st.columns([2, 3, 2])
+        with col2:
+            try:
+                st.image("Amity_logo2.png", use_container_width=True)
+            except Exception:
+                pass
     st.markdown(
         "<div class='auth-hero'>"
         "<h1>🦠 Personalized Laboratory Test Recommendation System</h1>"
