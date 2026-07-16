@@ -450,6 +450,7 @@ def main():
                 text-align:center;
                 color:{PRIMARY_COLOR};
                 font-weight:700;
+                font-size:1.8rem;
             ">
             🦠 Personalized Laboratory Test Recommendation System
             </h1>
@@ -463,6 +464,7 @@ def main():
                 text-align:center;
                 color:{SECONDARY_COLOR};
                 font-weight:600;
+                font-size:1.2rem;
                 margin-top:-8px;
             ">
             Advanced AI-Powered Diagnostic Tool for Viral Infections
