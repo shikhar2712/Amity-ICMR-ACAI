@@ -660,18 +660,18 @@ def _auth_logos_html():
                 + base64.b64encode(buf.getvalue()).decode())
 
     try:
-        icmr = _enc("logo_1.jpeg", 78)
-        amity = _enc("Amity_logo2.png", 78)
+        icmr = _enc("logo_1.jpeg", 96)
+        amity = _enc("Amity_logo2.png", 96)
     except Exception:
         return ""
 
     return (
         "<div style='display:flex;align-items:center;justify-content:center;"
         "gap:1.75rem;flex-wrap:wrap;margin:0.6rem 0 0.4rem;'>"
-        f"<img src='{icmr}' alt='ICMR-NIE' style='height:78px;width:auto;'>"
-        "<span style='width:1px;height:60px;background:rgba(49,51,63,0.18);'></span>"
+        f"<img src='{icmr}' alt='ICMR-NIE' style='height:96px;width:auto;'>"
+        "<span style='width:1px;height:74px;background:rgba(49,51,63,0.18);'></span>"
         f"<img src='{amity}' alt='Amity Centre for Artificial Intelligence' "
-        "style='height:78px;width:auto;'>"
+        "style='height:96px;width:auto;'>"
         "</div>"
     )
 
