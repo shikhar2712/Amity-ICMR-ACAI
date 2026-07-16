@@ -462,7 +462,7 @@ def main():
             Medical Disclaimer
             </b>
     
-            <br><br>
+          
     
             This system is designed to assist healthcare professionals and should not be used as a substitute for professional medical diagnosis, treatment, or medical advice.
     
