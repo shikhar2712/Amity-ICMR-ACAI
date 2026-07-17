@@ -666,18 +666,23 @@ def _auth_logos_html():
     except Exception:
         return ""
 
-    divider = ("<span style='width:1px;height:74px;"
+    # Single horizontal row that never wraps: nowrap keeps all three logos on
+    # one line, and each image is capped by both a max-height (wide screens)
+    # and a max-width percentage (narrow screens) so the row stays symmetric
+    # and fits without a logo dropping to a second line.
+    divider = ("<span style='flex:0 0 auto;width:1px;height:58px;"
                "background:rgba(49,51,63,0.18);'></span>")
+    img_style = ("max-height:80px;max-width:30%;width:auto;height:auto;"
+                 "object-fit:contain;")
     return (
         "<div style='display:flex;align-items:center;justify-content:center;"
-        "gap:1.75rem;flex-wrap:wrap;margin:0.6rem 0 0.4rem;'>"
-        f"<img src='{icmr}' alt='ICMR-NIE' style='height:96px;width:auto;'>"
+        "gap:1rem;flex-wrap:nowrap;margin:0.6rem 0 0.4rem;'>"
+        f"<img src='{icmr}' alt='ICMR-NIE' style='{img_style}'>"
         f"{divider}"
-        f"<img src='{dhr}' alt='Department of Health Research' "
-        "style='height:96px;width:auto;'>"
+        f"<img src='{dhr}' alt='Department of Health Research' style='{img_style}'>"
         f"{divider}"
         f"<img src='{amity}' alt='Amity Centre for Artificial Intelligence' "
-        "style='height:96px;width:auto;'>"
+        f"style='{img_style}'>"
         "</div>"
     )
 
