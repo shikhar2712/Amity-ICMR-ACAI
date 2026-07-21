@@ -511,7 +511,7 @@ def _render_view_detail(rec):
         dr = {
             "Recommended": rec.get('doctor_recommended_viruses'), "Lab ID": rec.get('lab_id'),
             "Test Performed": rec.get('test_performed'), "Laboratory Results": rec.get('laboratory_results'),
-            "Confirmed Pathogen": rec.get('confirmed_pathogen'), "Date of Report": rec.get('date_of_report'),
+            "Doctor Recommended Pathogen": rec.get('confirmed_pathogen'), "Date of Report": rec.get('date_of_report'),
         }
         st.table({"Field": list(dr.keys()), "Value": [_fmt(v) for v in dr.values()]})
 
@@ -566,15 +566,23 @@ def _render_edit_form(rec):
 
 def _render_update_dr_form(rec):
     st.subheader(f"🩺 Update Doctor Recommendation — Patient {_identifier(rec)}")
-    pathogen_options = [""] + DR_SUSPECTED_PATHOGENS
-    current_pathogen = rec.get('confirmed_pathogen') or ""
-    default_idx = pathogen_options.index(current_pathogen) if current_pathogen in pathogen_options else 0
+    pathogen_options = DR_SUSPECTED_PATHOGENS
+    # The value is stored in the same 'confirmed_pathogen' field as before, now
+    # as a comma-separated list of up to 5 pathogens. Parse any existing value
+    # (a single pathogen from older records, or a comma-separated list) back
+    # into the multiselect's default, keeping only names still in the list.
+    raw_current = rec.get('confirmed_pathogen') or ""
+    current_selection = [
+        p.strip() for p in raw_current.split(",") if p.strip() in pathogen_options
+    ]
     with st.form(key=f"dr_form_{rec['_id']}"):
         lab_id = st.text_input("Lab ID (required to complete)", value=rec.get('lab_id') or "")
-        confirmed_pathogen = st.selectbox(
-            "Confirmed Pathogen",
+        recommended_pathogens = st.multiselect(
+            "Doctor Recommended Pathogen",
             options=pathogen_options,
-            index=default_idx,
+            default=current_selection,
+            max_selections=5,
+            help="Select up to 5 pathogens.",
         )
 
         if st.form_submit_button("💾 Save Doctor Recommendation", type="primary", use_container_width=True):
@@ -584,7 +592,7 @@ def _render_update_dr_form(rec):
                 payload = {
                     'prediction_id': rec['_id'],
                     'lab_id': lab_id.strip(),
-                    'confirmed_pathogen': confirmed_pathogen,
+                    'confirmed_pathogen': ", ".join(recommended_pathogens),
                 }
                 if save_doctor_lab_data_to_db(payload):
                     _flash("✅ Doctor recommendation saved — case marked completed.")
