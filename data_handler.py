@@ -268,24 +268,63 @@ class DataHandler:
         return months[month_num] if 1 <= month_num <= 12 else 'Unknown'
     
     def _transform_symptoms_to_readable(self, patient_data: Dict) -> Dict:
-        """Transform symptom flags to human-readable flat structure for CSV export"""
-        # Define all possible symptoms (from SYMPTOM_GROUPS in app.py)
-        all_symptoms = [
-            'HEADACHE', 'IRRITABILITY', 'ALTERED SENSORIUM', 'SOMNOLENCE', 'NECK RIGIDITY', 'SEIZURES',
-            'DIARRHEA', 'DYSENTERY', 'NAUSEA', 'VOMITING', 'ABDOMINAL PAIN',
-            'MALAISE', 'MYALGIA', 'ARTHRALGIA', 'CHILLS', 'RIGORS', 'FEVER',
-            'BREATHLESSNESS', 'COUGH', 'RHINORRHEA', 'SORE THROAT',
-            'BULLAE', 'PAPULAR RASH', 'PUSTULAR RASH', 'MUSCULAR RASH', 'MACULOPAPULAR RASH', 'ESCHAR',
-            'DARK URINE', 'HEPATOMEGALY', 'JAUNDICE',
-            'RED EYE', 'DISCHARGE EYES', 'CRUSHING EYES'
+        """Transform symptom flags to a human-readable flat structure for CSV
+        export.
+
+        The lookup keys MUST match the canonical no-space symptom identifiers
+        the app stores in ``patient_data`` (``model_handler.ALL_SYMPTOMS``).
+        The previous version used spaced names (e.g. ``'ALTERED SENSORIUM'``),
+        so every multi-word symptom was always recorded as ``'No'`` regardless
+        of what the clinician selected, and two symptoms were omitted entirely.
+
+        Each entry below is ``(stored_key, human_readable_words)``. The output
+        column name stays ``symptom_<snake_case>`` (unchanged for existing
+        columns). ``'IRRITABLITY'`` is deliberately spelled to match the stored
+        key even though the displayed word is "Irritability".
+        """
+        symptom_labels = [
+            ('HEADACHE', 'Headache'),
+            ('IRRITABLITY', 'Irritability'),
+            ('ALTEREDSENSORIUM', 'Altered Sensorium'),
+            ('SOMNOLENCE', 'Somnolence'),
+            ('NECKRIGIDITY', 'Neck Rigidity'),
+            ('SEIZURES', 'Seizures'),
+            ('DIARRHEA', 'Diarrhea'),
+            ('DYSENTERY', 'Dysentery'),
+            ('NAUSEA', 'Nausea'),
+            ('VOMITING', 'Vomiting'),
+            ('ABDOMINALPAIN', 'Abdominal Pain'),
+            ('MALAISE', 'Malaise'),
+            ('MYALGIA', 'Myalgia'),
+            ('ARTHRALGIA', 'Arthralgia'),
+            ('CHILLS', 'Chills'),
+            ('RIGORS', 'Rigors'),
+            ('FEVER', 'Fever'),
+            ('BREATHLESSNESS', 'Breathlessness'),
+            ('COUGH', 'Cough'),
+            ('RHINORRHEA', 'Rhinorrhea'),
+            ('SORETHROAT', 'Sore Throat'),
+            ('BULLAE', 'Bullae'),
+            ('PAPULARRASH', 'Papular Rash'),
+            ('PUSTULARRASH', 'Pustular Rash'),
+            ('MUSCULARRASH', 'Muscular Rash'),
+            ('MACULOPAPULARRASH', 'Maculopapular Rash'),
+            ('ESCHAR', 'Eschar'),
+            ('DARKURINE', 'Dark Urine'),
+            ('HEPATOMEGALY', 'Hepatomegaly'),
+            ('JAUNDICE', 'Jaundice'),
+            ('REDEYE', 'Red Eye'),
+            ('DISCHARGEEYES', 'Discharge Eyes'),
+            ('CRUSHINGEYES', 'Crushing Eyes'),
+            ('SWELLINGEYES', 'Swelling Eyes'),
+            ('RETROORBITALPAIN', 'Retro Orbital Pain'),
         ]
-        
-        # Create flat symptom structure
+
         symptoms_dict = {}
-        for symptom in all_symptoms:
-            readable_name = f"symptom_{symptom.lower().replace(' ', '_')}"
-            symptoms_dict[readable_name] = 'Yes' if patient_data.get(symptom, 0) == 1 else 'No'
-        
+        for key, label in symptom_labels:
+            column = f"symptom_{label.lower().replace(' ', '_')}"
+            symptoms_dict[column] = 'Yes' if patient_data.get(key, 0) == 1 else 'No'
+
         return symptoms_dict
     
     def save_patient(self, patient_data: Dict) -> Optional[str]:
@@ -557,7 +596,8 @@ class DataHandler:
             # Reorder columns for better CSV structure
             column_order = [
                 'patient_id', 'age', 'sex', 'patient_type',
-                'state_name', 'district_name', 'syndrome_name', 'syndrome_specification',
+                'state_name', 'district_name', 'subdistrict', 'pin_code', 'address_line',
+                'syndrome_name', 'syndrome_specification',
                 'onset_of_illness', 'duration_of_illness_days', 'month_name', 'year', 'prediction_timestamp'
             ]
             
