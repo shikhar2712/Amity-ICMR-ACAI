@@ -11,6 +11,56 @@ from typing import Dict, List, Optional, Any
 # Configure logging
 logger = logging.getLogger(__name__)
 
+# Canonical clinical symptoms for readable/CSV output, as
+# (stored_key, human_readable_words). Keys MUST match the no-space identifiers
+# the app stores in patient_data (model_handler.ALL_SYMPTOMS) -- e.g.
+# 'ALTEREDSENSORIUM', and 'IRRITABLITY' spelled to match the stored key even
+# though the display word is "Irritability". Shared so every export path (this
+# module's export_to_csv and dashboard.py's per-patient CSV) stays consistent.
+SYMPTOM_LABELS = [
+    ('HEADACHE', 'Headache'),
+    ('IRRITABLITY', 'Irritability'),
+    ('ALTEREDSENSORIUM', 'Altered Sensorium'),
+    ('SOMNOLENCE', 'Somnolence'),
+    ('NECKRIGIDITY', 'Neck Rigidity'),
+    ('SEIZURES', 'Seizures'),
+    ('DIARRHEA', 'Diarrhea'),
+    ('DYSENTERY', 'Dysentery'),
+    ('NAUSEA', 'Nausea'),
+    ('VOMITING', 'Vomiting'),
+    ('ABDOMINALPAIN', 'Abdominal Pain'),
+    ('MALAISE', 'Malaise'),
+    ('MYALGIA', 'Myalgia'),
+    ('ARTHRALGIA', 'Arthralgia'),
+    ('CHILLS', 'Chills'),
+    ('RIGORS', 'Rigors'),
+    ('FEVER', 'Fever'),
+    ('BREATHLESSNESS', 'Breathlessness'),
+    ('COUGH', 'Cough'),
+    ('RHINORRHEA', 'Rhinorrhea'),
+    ('SORETHROAT', 'Sore Throat'),
+    ('BULLAE', 'Bullae'),
+    ('PAPULARRASH', 'Papular Rash'),
+    ('PUSTULARRASH', 'Pustular Rash'),
+    ('MUSCULARRASH', 'Muscular Rash'),
+    ('MACULOPAPULARRASH', 'Maculopapular Rash'),
+    ('ESCHAR', 'Eschar'),
+    ('DARKURINE', 'Dark Urine'),
+    ('HEPATOMEGALY', 'Hepatomegaly'),
+    ('JAUNDICE', 'Jaundice'),
+    ('REDEYE', 'Red Eye'),
+    ('DISCHARGEEYES', 'Discharge Eyes'),
+    ('CRUSHINGEYES', 'Crushing Eyes'),
+    ('SWELLINGEYES', 'Swelling Eyes'),
+    ('RETROORBITALPAIN', 'Retro Orbital Pain'),
+]
+
+
+def symptom_column_name(label: str) -> str:
+    """CSV/readable column name for a symptom display label (symptom_<snake_case>)."""
+    return f"symptom_{label.lower().replace(' ', '_')}"
+
+
 class DataHandler:
     """Handles all database operations for the virus prediction app"""
     
@@ -277,53 +327,14 @@ class DataHandler:
         so every multi-word symptom was always recorded as ``'No'`` regardless
         of what the clinician selected, and two symptoms were omitted entirely.
 
-        Each entry below is ``(stored_key, human_readable_words)``. The output
-        column name stays ``symptom_<snake_case>`` (unchanged for existing
-        columns). ``'IRRITABLITY'`` is deliberately spelled to match the stored
-        key even though the displayed word is "Irritability".
+        The column name stays ``symptom_<snake_case>`` (unchanged for existing
+        columns). Keys/labels come from the shared ``SYMPTOM_LABELS`` constant.
         """
-        symptom_labels = [
-            ('HEADACHE', 'Headache'),
-            ('IRRITABLITY', 'Irritability'),
-            ('ALTEREDSENSORIUM', 'Altered Sensorium'),
-            ('SOMNOLENCE', 'Somnolence'),
-            ('NECKRIGIDITY', 'Neck Rigidity'),
-            ('SEIZURES', 'Seizures'),
-            ('DIARRHEA', 'Diarrhea'),
-            ('DYSENTERY', 'Dysentery'),
-            ('NAUSEA', 'Nausea'),
-            ('VOMITING', 'Vomiting'),
-            ('ABDOMINALPAIN', 'Abdominal Pain'),
-            ('MALAISE', 'Malaise'),
-            ('MYALGIA', 'Myalgia'),
-            ('ARTHRALGIA', 'Arthralgia'),
-            ('CHILLS', 'Chills'),
-            ('RIGORS', 'Rigors'),
-            ('FEVER', 'Fever'),
-            ('BREATHLESSNESS', 'Breathlessness'),
-            ('COUGH', 'Cough'),
-            ('RHINORRHEA', 'Rhinorrhea'),
-            ('SORETHROAT', 'Sore Throat'),
-            ('BULLAE', 'Bullae'),
-            ('PAPULARRASH', 'Papular Rash'),
-            ('PUSTULARRASH', 'Pustular Rash'),
-            ('MUSCULARRASH', 'Muscular Rash'),
-            ('MACULOPAPULARRASH', 'Maculopapular Rash'),
-            ('ESCHAR', 'Eschar'),
-            ('DARKURINE', 'Dark Urine'),
-            ('HEPATOMEGALY', 'Hepatomegaly'),
-            ('JAUNDICE', 'Jaundice'),
-            ('REDEYE', 'Red Eye'),
-            ('DISCHARGEEYES', 'Discharge Eyes'),
-            ('CRUSHINGEYES', 'Crushing Eyes'),
-            ('SWELLINGEYES', 'Swelling Eyes'),
-            ('RETROORBITALPAIN', 'Retro Orbital Pain'),
-        ]
-
         symptoms_dict = {}
-        for key, label in symptom_labels:
-            column = f"symptom_{label.lower().replace(' ', '_')}"
-            symptoms_dict[column] = 'Yes' if patient_data.get(key, 0) == 1 else 'No'
+        for key, label in SYMPTOM_LABELS:
+            symptoms_dict[symptom_column_name(label)] = (
+                'Yes' if patient_data.get(key, 0) == 1 else 'No'
+            )
 
         return symptoms_dict
     
