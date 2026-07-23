@@ -25,6 +25,8 @@ from data_handler import (
     update_patient_record_in_db,
     soft_delete_record_in_db,
     save_doctor_lab_data_to_db,
+    SYMPTOM_LABELS,
+    symptom_column_name,
 )
 
 # Virus options for the Doctor-Recommendation / Lab multiselects. model_handler
@@ -368,6 +370,17 @@ def _build_grid_df(recs, start_index):
     ])
 
 
+def _selected_symptoms(rec):
+    """Comma-separated list of the symptoms marked present on a record. Reads
+    the stored per-symptom 'Yes'/'No' flags (symptom_<snake_case>) using the
+    shared SYMPTOM_LABELS, so the label text matches the rest of the app."""
+    picked = [
+        label for _key, label in SYMPTOM_LABELS
+        if str(rec.get(symptom_column_name(label), "")).strip().lower() == "yes"
+    ]
+    return ", ".join(picked) if picked else "—"
+
+
 def _build_export_df(recs):
     """CSV-export rows (one row per patient): ICMR-specified column order plus
     the Top 5 predicted viruses with their probabilities. The Top 5 values are
@@ -384,11 +397,17 @@ def _build_export_df(recs):
             "Date of Admission": r.get('date_of_admission') or "—",
             "Patient Name": _patient_name(r) or "—",
             "Address": r.get('address_line') or r.get('address') or "—",
+            "State": r.get('state_name') or "—",
+            "District": r.get('district_name') or "—",
+            "Subdistrict": r.get('subdistrict') or "—",
+            "Pin Code": r.get('pin_code') or "—",
             "Mobile No": r.get('mobile_no') or "—",
             "Lab ID": r.get('lab_id') or "",
             "Age": r.get('age') if r.get('age') not in (None, "") else "—",
             "Sex": r.get('sex') or "—",
             "Patient Type": r.get('patient_type') or "—",
+            "Syndrome": r.get('syndrome_name') or "—",
+            "Selected Symptoms": _selected_symptoms(r),
             "Onset of Illness": r.get('onset_of_illness') or "—",
             "Duration of Illness (days)": r.get('duration_of_illness_days')
                 if r.get('duration_of_illness_days') not in (None, "") else "—",
@@ -406,8 +425,11 @@ def _build_export_df(recs):
         rows.append(row)
 
     cols = ["Date of Collection", "Patient MRD ID", "Hospital", "Patient Study ID",
-            "Department", "Date of Admission", "Patient Name", "Address", "Mobile No", "Lab ID",
-            "Age", "Sex", "Patient Type", "Onset of Illness", "Duration of Illness (days)"]
+            "Department", "Date of Admission", "Patient Name",
+            "Address", "State", "District", "Subdistrict", "Pin Code",
+            "Mobile No", "Lab ID", "Age", "Sex", "Patient Type",
+            "Syndrome", "Selected Symptoms",
+            "Onset of Illness", "Duration of Illness (days)"]
     for n in range(1, 6):
         cols += [f"Top {n} Virus", f"Top {n} Probability (%)"]
     return pd.DataFrame(rows, columns=cols)
