@@ -383,9 +383,10 @@ def _selected_symptoms(rec):
 
 def _build_export_df(recs):
     """CSV-export rows (one row per patient): ICMR-specified column order plus
-    the Top 5 predicted viruses with their probabilities. The Top 5 values are
-    already stored on each record (top_1_virus/top_1_confidence ... top_5_*),
-    so this only formats existing data — no recompute, no model access."""
+    the doctor's recommended pathogen(s) and case status, and the Top 5
+    predicted viruses with their probabilities. All values are already stored
+    on each record (including 'confirmed_pathogen' and the top_N_* fields), so
+    this only formats existing data — no recompute, no model access."""
     rows = []
     for r in recs:
         row = {
@@ -403,6 +404,12 @@ def _build_export_df(recs):
             "Pin Code": r.get('pin_code') or "—",
             "Mobile No": r.get('mobile_no') or "—",
             "Lab ID": r.get('lab_id') or "",
+            # Doctor's recommended pathogen(s) — entered in the Update Doctor
+            # Recommendation form once the case is completed (stored comma-
+            # separated in 'confirmed_pathogen'). Empty while the case is
+            # still pending.
+            "Doctor Recommended Pathogen": r.get('confirmed_pathogen') or "—",
+            "Status": "Completed" if _is_completed(r) else "Pending",
             "Age": r.get('age') if r.get('age') not in (None, "") else "—",
             "Sex": r.get('sex') or "—",
             "Patient Type": r.get('patient_type') or "—",
@@ -427,7 +434,8 @@ def _build_export_df(recs):
     cols = ["Date of Collection", "Patient MRD ID", "Hospital", "Patient Study ID",
             "Department", "Date of Admission", "Patient Name",
             "Address", "State", "District", "Subdistrict", "Pin Code",
-            "Mobile No", "Lab ID", "Age", "Sex", "Patient Type",
+            "Mobile No", "Lab ID", "Doctor Recommended Pathogen", "Status",
+            "Age", "Sex", "Patient Type",
             "Syndrome", "Selected Symptoms",
             "Onset of Illness", "Duration of Illness (days)"]
     for n in range(1, 6):
